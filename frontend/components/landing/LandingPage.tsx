@@ -1,7 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const backendBase = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+
+type ApiProduct = {
+  id: number;
+  title: string;
+  description?: string;
+  category?: string;
+  price_cents?: number;
+  currency?: string;
+  images?: string[];
+};
 
 function ProductCard({
   imagePath,
@@ -15,13 +28,13 @@ function ProductCard({
   subtitle: string;
 }) {
   return (
-    <div className="overflow-hidden rounded-2xl bg-zinc-50 shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10),0px_10px_15px_-3px_rgba(0,0,0,0.10)]">
+    <div className="w-[320px] overflow-hidden rounded-2xl bg-zinc-50 shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10),0px_10px_15px_-3px_rgba(0,0,0,0.10)]">
       <div className="p-6">
         <div className="overflow-hidden rounded-[28px] bg-white shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10),0px_10px_15px_-3px_rgba(0,0,0,0.10)]">
           <img
             src={`${backendBase}${imagePath}`}
             alt={title}
-            className="h-48 w-full object-cover"
+            className="h-44 w-full object-cover"
             loading="lazy"
           />
         </div>
@@ -30,6 +43,36 @@ function ProductCard({
         </div>
         <div className="mt-2 text-lg font-bold text-black">{title}</div>
         <div className="mt-1 text-sm text-zinc-600">{subtitle}</div>
+      </div>
+    </div>
+  );
+}
+
+function RollingRail({
+  items,
+  seconds,
+}: {
+  items: Array<{ imagePath: string; category: string; title: string; subtitle: string }>;
+  seconds: number;
+}) {
+  // Duplicate items for a seamless loop.
+  const doubled = useMemo(() => [...items, ...items], [items]);
+
+  return (
+    <div className="relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white to-transparent" />
+      <div
+        className="flex w-[200%] gap-6 py-2"
+        style={{
+          animation: `carousel ${seconds}s linear infinite`,
+        }}
+      >
+        {doubled.map((item, idx) => (
+          <Link key={`${item.title}-${idx}`} href="/auth" className="block shrink-0">
+            <ProductCard {...item} />
+          </Link>
+        ))}
       </div>
     </div>
   );
@@ -56,6 +99,86 @@ function HowItWorksCard({
 }
 
 export function LandingPage() {
+  const fallback: ApiProduct[] = useMemo(
+    () => [
+      {
+        id: 1,
+        title: "Lenovo IdeaPad",
+        description: "A minimalist daily-driver laptop with clean performance and a slim profile.",
+        category: "Laptops",
+        images: ["/product_images/laptops/lenovo-idea-pad.avif"],
+      },
+      {
+        id: 2,
+        title: "MacBook Pro 16",
+        description: "Powerful, refined, and fast for demanding creative and development work.",
+        category: "Laptops",
+        images: ["/product_images/laptops/macbook-pro-16.jpg"],
+      },
+      {
+        id: 3,
+        title: "Dell XPS 17",
+        description: "A clean, premium build with a large display and strong performance.",
+        category: "Laptops",
+        images: ["/product_images/laptops/xps-17.avif"],
+      },
+      {
+        id: 4,
+        title: "Nike Air Max 720",
+        description: "Comfort-first style built for everyday steps.",
+        category: "Shoes",
+        images: ["/product_images/shoes/nke-air-max-720-black.webp"],
+      },
+      {
+        id: 5,
+        title: "Puma Sport",
+        description: "Simple and durable sneaker for daily wear.",
+        category: "Shoes",
+        images: ["/product_images/shoes/puma-sport.jpg"],
+      },
+    ],
+    [],
+  );
+
+  const [products, setProducts] = useState<ApiProduct[]>(fallback);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const res = await fetch(`${backendBase}/products?limit=20`, { cache: "no-store" });
+        if (!res.ok) return;
+        const data = (await res.json()) as ApiProduct[];
+        if (!cancelled && Array.isArray(data) && data.length > 0) setProducts(data);
+      } catch {
+        // Keep fallback.
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const railItems = useMemo(() => {
+    const mapped = products
+      .map((p) => {
+        const imagePath = p.images?.[0];
+        if (!imagePath) return null;
+        return {
+          imagePath,
+          category: p.category || "Product",
+          title: p.title,
+          subtitle: (p.description || "").slice(0, 64) || "Curated pick for the Hweibo demo catalog.",
+        };
+      })
+      .filter(Boolean) as Array<{ imagePath: string; category: string; title: string; subtitle: string }>;
+
+    // Ensure we have enough cards for a smooth rail.
+    if (mapped.length >= 6) return mapped;
+    return [...mapped, ...mapped, ...mapped].slice(0, 9);
+  }, [products]);
+
   return (
     <div className="bg-white text-black">
       <section className="relative overflow-hidden pt-28">
@@ -78,7 +201,7 @@ export function LandingPage() {
 
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
-              href="/auth/login"
+              href="/auth"
               className="inline-flex h-14 items-center justify-center gap-3 rounded-full bg-black px-8 text-base font-bold text-white shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] transition hover:bg-black/90"
             >
               Get Started
@@ -93,29 +216,21 @@ export function LandingPage() {
               Learn more
             </Link>
           </div>
+
+          <div className="mt-6 flex flex-col items-center justify-center gap-2 text-sm text-zinc-500 sm:flex-row">
+            <span>Already have an account?</span>
+            <Link href="/auth/login" className="font-semibold text-black underline underline-offset-4">
+              Login
+            </Link>
+            <span className="hidden sm:inline">·</span>
+            <Link href="/auth/register" className="font-semibold text-black underline underline-offset-4">
+              Sign up
+            </Link>
+          </div>
         </div>
 
-        <div className="mx-auto mt-14 w-[min(94%,1200px)]">
-          <div className="grid gap-6 md:grid-cols-3">
-            <ProductCard
-              imagePath="/product_images/laptops/lenovo-idea-pad.avif"
-              category="Laptops"
-              title="Lenovo IdeaPad"
-              subtitle="Clean performance for everyday work."
-            />
-            <ProductCard
-              imagePath="/product_images/laptops/macbook-pro-16.jpg"
-              category="Laptops"
-              title="MacBook Pro 16"
-              subtitle="Powerful, refined, and fast."
-            />
-            <ProductCard
-              imagePath="/product_images/shoes/nke-air-max-720-black.webp"
-              category="Shoes"
-              title="Nike Air Max 720"
-              subtitle="Comfort-first style for daily wear."
-            />
-          </div>
+        <div className="mx-auto mt-14 w-[min(98%,1400px)]">
+          <RollingRail items={railItems} seconds={42} />
         </div>
       </section>
 
@@ -186,7 +301,7 @@ export function LandingPage() {
         </p>
         <div className="mt-10">
           <Link
-            href="/auth/login"
+            href="/auth/register"
             className="inline-flex h-16 items-center justify-center rounded-full bg-white px-10 text-base font-bold text-black transition hover:bg-zinc-100"
           >
             Get Started Now
