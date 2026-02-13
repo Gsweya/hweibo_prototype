@@ -12,9 +12,11 @@ from __future__ import annotations
 import os
 from datetime import datetime, timezone
 from enum import Enum
+from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from sqlmodel import Field as SQLField
 from sqlmodel import Relationship, SQLModel, Session, create_engine, select
@@ -277,6 +279,11 @@ class PromptResponse(BaseModel):
 
 app = FastAPI(title="Hweibo API", version="0.2.0")
 
+# Serve sample product images from the repo (and from inside the Docker image).
+_PRODUCT_IMAGES_DIR = Path(__file__).resolve().parent / "product_images"
+if _PRODUCT_IMAGES_DIR.exists():
+    app.mount("/product_images", StaticFiles(directory=str(_PRODUCT_IMAGES_DIR)), name="product_images")
+
 
 @app.on_event("startup")
 def _startup() -> None:
@@ -358,12 +365,37 @@ def list_products(limit: int = 25) -> list[dict]:
     # Minimal endpoint to support buyer browse/search pages.
     if HWEIBO_PROFILE == ProfileMode.prototype or engine is None:
         return [
-            {"id": 1, "title": "Canon Camera", "price_cents": 89900, "currency": "USD"},
-            {"id": 2, "title": "MacBook Pro 16", "price_cents": 219900, "currency": "USD"},
+            {
+                "id": 1,
+                "title": "Lenovo IdeaPad",
+                "description": "A minimalist daily-driver laptop with clean performance and a slim profile.",
+                "category": "Laptops",
+                "price_cents": 74900,
+                "currency": "USD",
+                "images": ["/product_images/laptops/lenovo-idea-pad.avif"],
+            },
+            {
+                "id": 2,
+                "title": "Canon Camera",
+                "description": "Capture crisp photos and smooth video with a reliable, portable camera body.",
+                "category": "Cameras",
+                "price_cents": 89900,
+                "currency": "USD",
+                "images": ["/product_images/canon_camera.jpg"],
+            },
         ][: max(1, min(limit, 50))]
 
+    # Real mode: fetch products + their images.
+    from sqlalchemy.orm import selectinload
+
     with Session(engine) as session:
-        rows = session.exec(select(Product).where(Product.is_active == True).limit(min(limit, 50))).all()  # noqa: E712
+        stmt = (
+            select(Product)
+            .where(Product.is_active == True)  # noqa: E712
+            .options(selectinload(Product.images))
+            .limit(min(limit, 50))
+        )
+        rows = session.exec(stmt).all()
         return [
             {
                 "id": p.id,
@@ -372,6 +404,7 @@ def list_products(limit: int = 25) -> list[dict]:
                 "category": p.category,
                 "price_cents": p.price_cents,
                 "currency": p.currency,
+                "images": [img.url for img in (p.images or [])],
             }
             for p in rows
         ]

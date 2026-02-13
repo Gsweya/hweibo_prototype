@@ -1,285 +1,198 @@
-"use client";
-
-import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
-import { Search, ShoppingCart, Star, Bot, Sparkles, ArrowRight } from "lucide-react";
+const backendBase = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+function ProductCard({
+  imagePath,
+  category,
+  title,
+  subtitle,
+}: {
+  imagePath: string;
+  category: string;
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <div className="overflow-hidden rounded-2xl bg-zinc-50 shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10),0px_10px_15px_-3px_rgba(0,0,0,0.10)]">
+      <div className="p-6">
+        <div className="overflow-hidden rounded-[28px] bg-white shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10),0px_10px_15px_-3px_rgba(0,0,0,0.10)]">
+          <img
+            src={`${backendBase}${imagePath}`}
+            alt={title}
+            className="h-48 w-full object-cover"
+            loading="lazy"
+          />
+        </div>
+        <div className="mt-5 text-xs font-extrabold uppercase tracking-[0.35em] text-zinc-400">
+          {category}
+        </div>
+        <div className="mt-2 text-lg font-bold text-black">{title}</div>
+        <div className="mt-1 text-sm text-zinc-600">{subtitle}</div>
+      </div>
+    </div>
+  );
+}
 
-const PRODUCTS = [
-  {
-    name: "MacBook Pro 16",
-    category: "Laptops",
-    price: "TZS 5,200,000",
-    image: "/backend/product_images/laptops/macbook-pro-16.jpg",
-    rating: 4.8,
-    reviews: 234,
-  },
-  {
-    name: "Asus ZenBook",
-    category: "Laptops",
-    price: "TZS 2,700,000",
-    image: "/backend/product_images/laptops/asus-zenbook.jpg",
-    rating: 4.5,
-    reviews: 156,
-  },
-  {
-    name: "Lenovo Legion Pro",
-    category: "Gaming Laptops",
-    price: "TZS 3,200,000",
-    image: "/backend/product_images/laptops/lenovo-legion-pro.webp",
-    rating: 4.7,
-    reviews: 189,
-  },
-  {
-    name: "Nike Air Max Plus",
-    category: "Sneakers",
-    price: "TZS 450,000",
-    image: "/backend/product_images/shoes/Nike-Air-Max-Plus.webp",
-    rating: 4.6,
-    reviews: 412,
-  },
-  {
-    name: "Puma Sport Classic",
-    category: "Sneakers",
-    price: "TZS 235,000",
-    image: "/backend/product_images/shoes/puma-sport.jpg",
-    rating: 4.4,
-    reviews: 98,
-  },
-  {
-    name: "Canon EOS Camera",
-    category: "Cameras",
-    price: "TZS 2,100,000",
-    image: "/backend/product_images/canon_camera.jpg",
-    rating: 4.9,
-    reviews: 267,
-  },
-  {
-    name: "Galaxy 5 Trainers",
-    category: "Running Shoes",
-    price: "TZS 185,000",
-    image: "/backend/product_images/shoes/galaxy-5-trainers-with-laces.jpg",
-    rating: 4.3,
-    reviews: 145,
-  },
-  {
-    name: "Programming Shirt",
-    category: "Fashion",
-    price: "TZS 45,000",
-    image: "/backend/product_images/shoes/programming_shirt-1.jpeg",
-    rating: 4.2,
-    reviews: 67,
-  },
-];
+function HowItWorksCard({
+  title,
+  description,
+  icon,
+}: {
+  title: string;
+  description: string;
+  icon: ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl bg-white p-6 shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10),0px_10px_15px_-3px_rgba(0,0,0,0.10)]">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-black text-white">
+        {icon}
+      </div>
+      <div className="mt-6 text-xl font-bold text-black">{title}</div>
+      <div className="mt-3 text-sm leading-6 text-zinc-500">{description}</div>
+    </div>
+  );
+}
 
 export function LandingPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<typeof PRODUCTS>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [aiThinking, setAiThinking] = useState(false);
-
-  const handleSearch = () => {
-    if (!searchQuery.trim()) return;
-    
-    setIsSearching(true);
-    setAiThinking(true);
-    
-    // Simulate AI processing
-    setTimeout(() => {
-      setAiThinking(false);
-      const results = PRODUCTS.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
-      ).slice(0, 5);
-      
-      setSearchResults(results);
-      setIsSearching(false);
-    }, 2000);
-  };
-
-  const clearSearch = () => {
-    setSearchQuery("");
-    setSearchResults([]);
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      {/* Navigation with Glassmorphism */}
-      <nav className="fixed left-0 right-0 top-0 z-50 bg-white/20 backdrop-blur-lg border-b border-white/20">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Hweibo
+    <div className="bg-white text-black">
+      <section className="relative overflow-hidden pt-28">
+        <div className="mx-auto w-[min(92%,1100px)] text-center">
+          <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-zinc-50 px-4 py-2 text-[11px] font-extrabold uppercase tracking-[0.35em] text-zinc-500 ring-1 ring-zinc-200">
+            <span className="h-2 w-2 rounded-full bg-zinc-400" />
+            The future of commerce
+          </div>
+
+          <h1 className="mt-6 text-5xl font-extrabold leading-[1.02] tracking-tight sm:text-6xl">
+            <span className="text-black">Shop smarter</span>
+            <br />
+            <span className="text-zinc-400">with Hweibo.</span>
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-2xl text-base font-medium leading-7 text-zinc-500 sm:text-lg">
+            A minimalist AI-powered shopping platform designed for the modern lifestyle. Effortless
+            discovery meets sophisticated design.
+          </p>
+
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/auth/login"
+              className="inline-flex h-14 items-center justify-center gap-3 rounded-full bg-black px-8 text-base font-bold text-white shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] transition hover:bg-black/90"
+            >
+              Get Started
+              <span aria-hidden className="inline-block">
+                →
+              </span>
             </Link>
-
-            <div className="hidden md:flex items-center space-x-6">
-              {["Home", "Features"].map((item) => (
-                <Link
-                  key={item}
-                  href="#"
-                  className="px-4 py-2 rounded-full text-sm font-medium text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 transition-all duration-300"
-                >
-                  {item}
-                </Link>
-              ))}
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <Button variant="ghost" className="px-6 py-2 rounded-full text-sm font-medium text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 transition-all duration-300">
-                Sign In
-              </Button>
-              <Button className="px-6 py-2 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg">
-                Get Started
-              </Button>
-            </div>
+            <Link
+              href="#how-it-works"
+              className="inline-flex h-14 items-center justify-center rounded-full px-8 text-base font-bold text-black ring-1 ring-zinc-200 transition hover:bg-zinc-50"
+            >
+              Learn more
+            </Link>
           </div>
         </div>
-      </nav>
 
-      {/* Main Container */}
-      <div className="pt-24 pb-12 px-6">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid lg:grid-cols-2 gap-8 items-start">
-            
-            {/* AI Assistant Container */}
-            <div className="bg-white/40 backdrop-blur-lg rounded-3xl border border-white/20 shadow-xl p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
-                  <Bot className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-slate-900">Hweibo AI Assistant</h2>
-                  <p className="text-sm text-slate-600">Your personal shopping expert</p>
-                </div>
-              </div>
+        <div className="mx-auto mt-14 w-[min(94%,1200px)]">
+          <div className="grid gap-6 md:grid-cols-3">
+            <ProductCard
+              imagePath="/product_images/laptops/lenovo-idea-pad.avif"
+              category="Laptops"
+              title="Lenovo IdeaPad"
+              subtitle="Clean performance for everyday work."
+            />
+            <ProductCard
+              imagePath="/product_images/laptops/macbook-pro-16.jpg"
+              category="Laptops"
+              title="MacBook Pro 16"
+              subtitle="Powerful, refined, and fast."
+            />
+            <ProductCard
+              imagePath="/product_images/shoes/nke-air-max-720-black.webp"
+              category="Shoes"
+              title="Nike Air Max 720"
+              subtitle="Comfort-first style for daily wear."
+            />
+          </div>
+        </div>
+      </section>
 
-              <div className="space-y-4">
-                {aiThinking && (
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
-                      <Bot className="w-4 h-4 text-white" />
-                    </div>
-                    <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-4 rounded-tl-none">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Sparkles className="w-4 h-4 text-purple-600 animate-pulse" />
-                        <span className="text-sm font-medium text-purple-600">Searching the market...</span>
-                      </div>
-                      <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce [animation-delay:0ms]"></div>
-                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce [animation-delay:150ms]"></div>
-                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce [animation-delay:300ms]"></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+      <section id="how-it-works" className="mt-20 border-y border-zinc-100 bg-zinc-50 py-16">
+        <div className="mx-auto w-[min(92%,1100px)]">
+          <div className="text-center">
+            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">How it works</h2>
+            <p className="mt-3 text-base text-zinc-500">
+              Simple, minimalist, and efficient shopping.
+            </p>
+          </div>
 
-                {searchResults.length > 0 && !aiThinking && (
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
-                      <Bot className="w-4 h-4 text-white" />
-                    </div>
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 rounded-tl-none border border-green-100">
-                      <p className="text-sm font-medium text-green-700 mb-1">Found {searchResults.length} great options for you!</p>
-                      <p className="text-xs text-green-600">Here are the best matches based on your search:</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-8">
-                <div className="relative">
-                  <Input
-                    type="text"
-                    placeholder="Ask me to find anything... (e.g., 'laptop under 3M TZS')"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                    className="w-full px-6 py-4 pr-14 border-0 bg-white/60 backdrop-blur-sm rounded-2xl focus:bg-white focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            <HowItWorksCard
+              title="Describe"
+              description={
+                "Tell Hweibo AI exactly what you are looking for in natural language. From style to specific technical features."
+              }
+              icon={
+                <svg width="22" height="22" viewBox="0 0 29 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M2.33496 28.675V7.66005C2.33496 7.01792 2.5636 6.46823 3.02087 6.01095C3.47814 5.55368 4.02784 5.32505 4.66996 5.32505H23.35C23.9921 5.32505 24.5418 5.55368 24.9991 6.01095C25.4563 6.46823 25.685 7.01792 25.685 7.66005V21.67C25.685 22.3122 25.4563 22.8619 24.9991 23.3191C24.5418 23.7764 23.9921 24.005 23.35 24.005H7.00496L2.33496 28.675ZM6.01259 21.67H23.35V7.66005H4.66996V22.9835L6.01259 21.67Z"
+                    fill="white"
                   />
-                  <Button
-                    onClick={handleSearch}
-                    disabled={isSearching || !searchQuery.trim()}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg"
-                  >
-                    {isSearching ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    ) : (
-                      <Search className="w-4 h-4 text-white" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Results Container */}
-            <div className="space-y-6">
-              {searchResults.length > 0 ? (
-                <>
-                  <div className="text-center">
-                    <h3 className="text-2xl font-bold text-slate-900 mb-2">Best Matches</h3>
-                    <p className="text-slate-600">Top {searchResults.length} results for your search</p>
-                  </div>
-                  <div className="grid gap-4">
-                    {searchResults.map((product, index) => (
-                      <Card key={product.name} className="bg-white/60 backdrop-blur-sm border border-white/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                        <CardContent className="p-4">
-                          <div className="flex gap-4">
-                            <div className="relative w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
-                              <Image
-                                src={product.image}
-                                alt={product.name}
-                                width={100}
-                                height={100}
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute top-1 left-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-semibold text-slate-700">
-                                #{index + 1}
-                              </div>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-semibold text-slate-900 mb-1 truncate">{product.name}</h4>
-                              <p className="text-xs text-slate-500 mb-2">{product.category}</p>
-                              <div className="flex items-center gap-3 mb-3">
-                                <div className="flex items-center gap-1">
-                                  <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                                  <span className="text-xs text-slate-600">{product.rating}</span>
-                                </div>
-                                <span className="text-xs text-slate-400">({product.reviews})</span>
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <p className="text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                                  {product.price}
-                                </p>
-                                <Button className="px-4 py-2 rounded-full text-xs font-medium bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 transition-all duration-300">
-                                  View Deal
-                                  <ArrowRight className="w-3 h-3 ml-1" />
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="bg-white/40 backdrop-blur-lg rounded-3xl border border-white/20 shadow-xl p-8 text-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-100 to-blue-100 flex items-center justify-center mx-auto mb-4">
-                    <Search className="w-8 h-8 text-purple-600" />
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Start Your Search</h3>
-                  <p className="text-slate-600">Ask the AI assistant to find the perfect products for you</p>
-                </div>
-              )}
-            </div>
+                </svg>
+              }
+            />
+            <HowItWorksCard
+              title="Curate"
+              description={
+                "Our AI scans thousands of products across the web to find your perfect matches instantly. No more scrolling."
+              }
+              icon={
+                <svg width="22" height="22" viewBox="0 0 29 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M22.1825 13.4975L20.7231 10.2869L17.5125 8.82753L20.7231 7.36815L22.1825 4.15753L23.6419 7.36815L26.8525 8.82753L23.6419 10.2869L22.1825 13.4975ZM10.5075 26.34L7.58873 19.9188L1.16748 17L7.58873 14.0813L10.5075 7.66003L13.4262 14.0813L19.8475 17L13.4262 19.9188L10.5075 26.34Z"
+                    fill="white"
+                  />
+                </svg>
+              }
+            />
+            <HowItWorksCard
+              title="Purchase"
+              description={
+                "Complete your purchase seamlessly with our integrated one-click checkout. Secure, fast, and unified."
+              }
+              icon={
+                <svg width="22" height="22" viewBox="0 0 29 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M1.16748 7.66005V5.32505H4.99104L9.95292 15.8325H18.1254L22.6787 7.66005H25.3347L20.1977 16.9417C19.9837 17.3308 19.6967 17.6324 19.3367 17.8465C18.9767 18.0605 18.5827 18.1675 18.1546 18.1675H9.45673L8.17248 20.5025H22.1825V22.8375H8.17248C7.29686 22.8375 6.63041 22.4581 6.17314 21.6992C5.71587 20.9404 5.70127 20.1718 6.12936 19.3934L7.70548 16.533L3.50248 7.66005H1.16748Z"
+                    fill="white"
+                  />
+                </svg>
+              }
+            />
           </div>
         </div>
-      </div>
+      </section>
+
+      <section className="mx-auto mt-20 w-[min(92%,1100px)] rounded-[40px] bg-black px-8 py-16 text-center text-white shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)]">
+        <h2 className="text-4xl font-extrabold leading-[1.05] sm:text-5xl">
+          Ready to transform your
+          <br />
+          shopping?
+        </h2>
+        <p className="mx-auto mt-6 max-w-2xl text-base text-zinc-300 sm:text-lg">
+          Join thousands of users shopping smarter every day with the most minimalist AI experience.
+        </p>
+        <div className="mt-10">
+          <Link
+            href="/auth/login"
+            className="inline-flex h-16 items-center justify-center rounded-full bg-white px-10 text-base font-bold text-black transition hover:bg-zinc-100"
+          >
+            Get Started Now
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

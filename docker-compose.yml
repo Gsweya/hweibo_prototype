@@ -20,7 +20,7 @@ services:
       context: ./backend
     environment:
       HWEIBO_PROFILE: ${HWEIBO_PROFILE:-prototype}
-      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg2://hweibo:hweibo_password@db:5432/hweibo}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://hweibo:hweibo_password@db:5432/hweibo}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-flash-latest}
     ports:

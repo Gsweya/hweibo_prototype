@@ -53,6 +53,20 @@ The API will be available at `http://localhost:8000`.
 docker compose up --build
 ```
 
+### Seed sample products (real mode)
+
+If you want the database populated with products that match the images in `backend/product_images/`:
+
+```bash
+docker compose run --rm backend python seed_db.py
+```
+
+To reseed (wipe and recreate demo data):
+
+```bash
+docker compose run --rm -e SEED_RESET=1 backend python seed_db.py
+```
+
 API:
 - `GET http://localhost:8000/health`
 - `POST http://localhost:8000/ai/prompts`
