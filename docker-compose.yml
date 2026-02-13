@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: hweibo
+      POSTGRES_USER: hweibo
+      POSTGRES_PASSWORD: hweibo_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hweibo -d hweibo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      HWEIBO_PROFILE: ${HWEIBO_PROFILE:-prototype}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg2://hweibo:hweibo_password@db:5432/hweibo}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-flash-latest}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pg_data:

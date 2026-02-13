@@ -2,6 +2,18 @@
 
 Minimal prototype repo with a TypeScript + Tailwind frontend and a Python API backend.
 
+## Backend profiles (prototype vs real)
+
+The backend supports a `prototype` vs `real` mode:
+- `prototype`: no external keys required, returns deterministic stub AI suggestions and stub product data.
+- `real`: uses Postgres + Gemini API.
+
+Environment variables:
+- `HWEIBO_PROFILE=prototype|real`
+- `DATABASE_URL=postgresql+psycopg2://...` (required for `real`)
+- `GEMINI_API_KEY=...` (required for `real`)
+- `GEMINI_MODEL=gemini-flash-latest` (optional)
+
 ## Repository layout
 
 - `frontend/`: React + TypeScript + Tailwind UI prototype.
@@ -14,11 +26,11 @@ Minimal prototype repo with a TypeScript + Tailwind frontend and a Python API ba
 
 ```bash
 cd frontend
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
-The UI will be available at `http://localhost:5173`.
+The UI will be available at `http://localhost:3000`.
 
 ### Backend
 
@@ -31,6 +43,19 @@ uvicorn app:app --reload
 ```
 
 The API will be available at `http://localhost:8000`.
+
+## Docker (backend + Postgres)
+
+1. Copy `.env.example` to `.env` and set `GEMINI_API_KEY` if using `real`.
+1. Run:
+
+```bash
+docker compose up --build
+```
+
+API:
+- `GET http://localhost:8000/health`
+- `POST http://localhost:8000/ai/prompts`
 
 ### Example API request
 

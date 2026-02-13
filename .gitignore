@@ -1,0 +1,37 @@
+
+# Node modules and build artifacts
+**/node_modules/
+frontend/.next/
+frontend/.turbo/
+backend/.next/
+
+# Bun and npm state
+bun.lockb
+package-lock.json
+
+# Python virtual environments
+.venv/
+venv/
+
+# IDE and system clutter
+.DS_Store
+.idea/
+.vscode/
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.local
+.env
+backend/.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Local scratch
+sample/
