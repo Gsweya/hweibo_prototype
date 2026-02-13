@@ -375,3 +375,12 @@ def list_products(limit: int = 25) -> list[dict]:
             }
             for p in rows
         ]
+
+
+if __name__ == "__main__":
+    # Convenience for local runs:
+    # Prefer: `uvicorn app:app --reload`
+    import uvicorn
+
+    port = int(os.getenv("PORT", "8000"))
+    uvicorn.run(app, host="0.0.0.0", port=port)
