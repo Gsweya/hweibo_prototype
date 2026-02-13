@@ -223,7 +223,35 @@ class AuditLog(SQLModel, table=True):
     created_at: datetime = SQLField(default_factory=lambda: datetime.now(timezone.utc))
 
 
-engine = create_engine(DATABASE_URL) if (HWEIBO_PROFILE == ProfileMode.real and DATABASE_URL) else None
+def _normalize_database_url(url: str) -> str:
+    """
+    Accept postgres URLs with or without an explicit driver.
+
+    On Python versions where psycopg2 wheels may not exist (e.g. 3.14),
+    we allow `pg8000` as a pure-Python fallback by rewriting the URL if needed.
+    """
+    if url.startswith("postgres://"):
+        # SQLAlchemy expects postgresql://
+        url = "postgresql://" + url.removeprefix("postgres://")
+
+    # If the user already specified a driver, respect it.
+    if url.startswith("postgresql+"):
+        return url
+
+    # No driver specified (postgresql://...). Choose a usable default.
+    try:
+        import psycopg2  # type: ignore  # noqa: F401
+
+        return "postgresql+psycopg2://" + url.removeprefix("postgresql://")
+    except Exception:
+        return "postgresql+pg8000://" + url.removeprefix("postgresql://")
+
+
+engine = (
+    create_engine(_normalize_database_url(DATABASE_URL))
+    if (HWEIBO_PROFILE == ProfileMode.real and DATABASE_URL)
+    else None
+)
 
 
 def create_db_and_tables() -> None:

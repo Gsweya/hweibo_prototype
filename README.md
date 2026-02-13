@@ -10,7 +10,7 @@ The backend supports a `prototype` vs `real` mode:
 
 Environment variables:
 - `HWEIBO_PROFILE=prototype|real`
-- `DATABASE_URL=postgresql+psycopg2://...` (required for `real`)
+- `DATABASE_URL=postgresql://...` or `postgresql+psycopg2://...` (required for `real`)
 - `GEMINI_API_KEY=...` (required for `real`)
 - `GEMINI_MODEL=gemini-flash-latest` (optional)
 
