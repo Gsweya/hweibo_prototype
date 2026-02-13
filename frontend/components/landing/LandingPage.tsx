@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const backendBase = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
@@ -16,33 +16,149 @@ type ApiProduct = {
   images?: string[];
 };
 
+function formatPrice(priceCents?: number, currency?: string) {
+  if (!priceCents) return "TZS 150,000";
+  const code = (currency || "TZS").toUpperCase();
+  const amount = priceCents / 100;
+  const formatted = amount.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  return `${code} ${formatted}`;
+}
+
+function TiltWrap({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const raf = useRef<number | null>(null);
+
+  const setVars = (rx: number, ry: number, gx: number, gy: number) => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.setProperty("--rx", `${rx}deg`);
+    el.style.setProperty("--ry", `${ry}deg`);
+    el.style.setProperty("--gx", `${gx}%`);
+    el.style.setProperty("--gy", `${gy}%`);
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+
+    const ry = (px - 0.5) * 10;
+    const rx = (0.5 - py) * 8;
+
+    const gx = Math.max(0, Math.min(100, px * 100));
+    const gy = Math.max(0, Math.min(100, py * 100));
+
+    if (raf.current) cancelAnimationFrame(raf.current);
+    raf.current = requestAnimationFrame(() => setVars(rx, ry, gx, gy));
+  };
+
+  const onPointerLeave = () => {
+    if (raf.current) cancelAnimationFrame(raf.current);
+    setVars(0, 0, 50, 50);
+  };
+
+  return (
+    <div className="shrink-0 [perspective:1000px]" onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}>
+      <div
+        ref={ref}
+        className="relative will-change-transform"
+        style={{
+          transform:
+            "rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0)",
+          transformStyle: "preserve-3d",
+          transition: "transform 180ms ease",
+        }}
+      >
+        <div
+          className="pointer-events-none absolute -inset-px rounded-[28px] opacity-0 transition-opacity duration-300"
+          style={{
+            background:
+              "radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,0.75), rgba(255,255,255,0) 55%)",
+          }}
+        />
+        <div className="group-hover:opacity-100">{children}</div>
+      </div>
+    </div>
+  );
+}
+
 function ProductCard({
   imagePath,
   category,
   title,
   subtitle,
+  store,
+  location,
+  price,
+  ctaHref,
 }: {
   imagePath: string;
   category: string;
   title: string;
   subtitle: string;
+  store: string;
+  location: string;
+  price: string;
+  ctaHref: string;
 }) {
   return (
-    <div className="w-[320px] overflow-hidden rounded-2xl bg-zinc-50 shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10),0px_10px_15px_-3px_rgba(0,0,0,0.10)]">
-      <div className="p-6">
-        <div className="overflow-hidden rounded-[28px] bg-white shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10),0px_10px_15px_-3px_rgba(0,0,0,0.10)]">
-          <img
-            src={`${backendBase}${imagePath}`}
-            alt={title}
-            className="h-44 w-full object-cover"
-            loading="lazy"
-          />
+    <div className="w-[320px] overflow-hidden rounded-[28px] border border-zinc-200 bg-white">
+      <div className="relative overflow-hidden">
+        <img
+          src={`${backendBase}${imagePath}`}
+          onError={(e) => {
+            // Fallback to local Next public assets when backend is not running.
+            e.currentTarget.src = imagePath;
+          }}
+          alt={title}
+          className="h-64 w-full object-cover"
+          loading="lazy"
+        />
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 px-5 pb-4">
+          <div className="text-2xl font-medium tracking-tight text-white">{title}</div>
+          <div className="mt-1 text-sm text-white/80">{subtitle}</div>
         </div>
-        <div className="mt-5 text-xs font-extrabold uppercase tracking-[0.35em] text-zinc-400">
+      </div>
+
+      <div className="px-5 pb-5 pt-4">
+        <div className="text-[11px] font-extrabold uppercase tracking-[0.35em] text-zinc-400">
           {category}
         </div>
-        <div className="mt-2 text-lg font-bold text-black">{title}</div>
-        <div className="mt-1 text-sm text-zinc-600">{subtitle}</div>
+
+        <div className="mt-3 grid gap-2 text-sm text-zinc-700">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100">
+              <span className="text-[11px]">🏬</span>
+            </span>
+            <span className="font-medium">{store}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100">
+              <span className="text-[11px]">📍</span>
+            </span>
+            <span className="truncate">{location}</span>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-7 items-center rounded-full border border-zinc-200 bg-white px-2 text-[12px] font-extrabold text-black">
+              {(price.split(" ")[0] || "TZS").toUpperCase()}
+            </span>
+            <span className="text-xl font-semibold tracking-tight text-black">
+              {price.split(" ").slice(1).join(" ") || price}
+            </span>
+          </div>
+          <Link
+            href={ctaHref}
+            className="inline-flex h-9 items-center justify-center rounded-full bg-black px-4 text-sm font-semibold text-white transition hover:bg-black/90"
+          >
+            Add to Cart
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -52,7 +168,15 @@ function RollingRail({
   items,
   seconds,
 }: {
-  items: Array<{ imagePath: string; category: string; title: string; subtitle: string }>;
+  items: Array<{
+    imagePath: string;
+    category: string;
+    title: string;
+    subtitle: string;
+    store: string;
+    location: string;
+    price: string;
+  }>;
   seconds: number;
 }) {
   // Duplicate items for a seamless loop.
@@ -69,9 +193,13 @@ function RollingRail({
         }}
       >
         {doubled.map((item, idx) => (
-          <Link key={`${item.title}-${idx}`} href="/auth" className="block shrink-0">
-            <ProductCard {...item} />
-          </Link>
+          <div key={`${item.title}-${idx}`} className="group shrink-0">
+            <TiltWrap>
+              <div className="transition-transform duration-300 group-hover:-translate-y-1">
+                <ProductCard {...item} ctaHref="/auth/login" />
+              </div>
+            </TiltWrap>
+          </div>
         ))}
       </div>
     </div>
@@ -88,7 +216,7 @@ function HowItWorksCard({
   icon: ReactNode;
 }) {
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10),0px_10px_15px_-3px_rgba(0,0,0,0.10)]">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-6">
       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-black text-white">
         {icon}
       </div>
@@ -169,10 +297,21 @@ export function LandingPage() {
           imagePath,
           category: p.category || "Product",
           title: p.title,
-          subtitle: (p.description || "").slice(0, 64) || "Curated pick for the Hweibo demo catalog.",
+          subtitle: (p.description || "").slice(0, 26) || "Minimalist pick.",
+          store: "Lark Stores, Inc.",
+          location: "Nyerere Sq., Dodoma",
+          price: formatPrice(p.price_cents, p.currency || "TZS"),
         };
       })
-      .filter(Boolean) as Array<{ imagePath: string; category: string; title: string; subtitle: string }>;
+      .filter(Boolean) as Array<{
+        imagePath: string;
+        category: string;
+        title: string;
+        subtitle: string;
+        store: string;
+        location: string;
+        price: string;
+      }>;
 
     // Ensure we have enough cards for a smooth rail.
     if (mapped.length >= 6) return mapped;
@@ -182,6 +321,10 @@ export function LandingPage() {
   return (
     <div className="bg-white text-black">
       <section className="relative overflow-hidden pt-28">
+        <div className="pointer-events-none absolute left-1/2 top-16 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,0,0,0.10),rgba(0,0,0,0)_62%)] blur-2xl" />
+        <div className="pointer-events-none absolute -left-24 top-20 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(0,0,0,0.08),rgba(0,0,0,0)_65%)] blur-2xl" />
+        <div className="pointer-events-none absolute -right-24 top-28 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(0,0,0,0.08),rgba(0,0,0,0)_65%)] blur-2xl" />
+
         <div className="mx-auto w-[min(92%,1100px)] text-center">
           <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-zinc-50 px-4 py-2 text-[11px] font-extrabold uppercase tracking-[0.35em] text-zinc-500 ring-1 ring-zinc-200">
             <span className="h-2 w-2 rounded-full bg-zinc-400" />
@@ -226,6 +369,46 @@ export function LandingPage() {
             <Link href="/auth/register" className="font-semibold text-black underline underline-offset-4">
               Sign up
             </Link>
+          </div>
+
+          <div className="mx-auto mt-10 w-full max-w-3xl">
+            <div className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-white px-6 py-5 text-left">
+              <div className="pointer-events-none absolute inset-0">
+                <div className="absolute -left-10 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-black/5 blur-2xl" />
+                <div className="absolute -right-10 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-black/5 blur-2xl" />
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-black/30 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-black/15 to-transparent" />
+              </div>
+
+              <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-zinc-50 px-3 py-1 text-xs font-extrabold uppercase tracking-[0.3em] text-zinc-500 ring-1 ring-zinc-200">
+                    <span className="inline-block h-2 w-2 rounded-full bg-black/60" />
+                    Sponsored AI picks
+                  </div>
+                  <div className="mt-3 text-lg font-semibold text-black">
+                    Gemini-assisted discovery, curated for clean results.
+                  </div>
+                  <div className="mt-1 text-sm text-zinc-600">
+                    Describe what you want. Hweibo suggests products instantly.
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/auth/register"
+                    className="inline-flex h-10 items-center justify-center rounded-full bg-black px-5 text-sm font-semibold text-white transition hover:bg-black/90"
+                  >
+                    Try AI Search
+                  </Link>
+                  <Link
+                    href="/auth/login"
+                    className="inline-flex h-10 items-center justify-center rounded-full px-5 text-sm font-semibold text-black ring-1 ring-zinc-200 transition hover:bg-zinc-50"
+                  >
+                    Sign in
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
