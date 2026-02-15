@@ -13,6 +13,7 @@ Environment variables:
 - `DATABASE_URL=postgresql://...` or `postgresql+psycopg2://...` (required for `real`)
 - `GEMINI_API_KEY=...` (required for `real`)
 - `GEMINI_MODEL=gemini-flash-latest` (optional)
+- `HWEIBO_API_KEY=...` (required for `real` to call `/ai/prompts`)
 
 ## Repository layout
 
@@ -71,10 +72,41 @@ API:
 - `GET http://localhost:8000/health`
 - `POST http://localhost:8000/ai/prompts`
 
+### Import agent_shopper catalog images (optional)
+
+If you have `agent_shopper/uploads/products/` in this repo and want to import it into the Postgres schema (products + multiple images per product):
+
+```bash
+cd backend
+source .venv/bin/activate
+export DATABASE_URL='postgresql://...'
+export IMPORT_STORE_NAME='Kibo Store'
+export IMPORT_STORE_REGION='Dodoma'
+export IMPORT_STORE_CITY='Dodoma'
+python import_agent_shopper_uploads.py
+```
+
+To wipe previously-imported products/images for that seller and re-import:
+
+```bash
+export IMPORT_RESET=1
+python import_agent_shopper_uploads.py
+```
+
+## WhatsApp (optional)
+
+There is a demo WhatsApp bot in `whatsapp_bot/` that connects via WhatsApp Web and calls the backend `/ai/prompts`.
+See `whatsapp_bot/README.md`.
+
 ### Example API request
 
 ```bash
 curl -X POST http://localhost:8000/ai/prompts \
   -H "Content-Type: application/json" \
+  -H "X-Hweibo-Api-Key: $HWEIBO_API_KEY" \
   -d '{"prompt": "Suggest sustainable hotel essentials"}'
 ```
+
+Response notes:
+- Always returns exactly 5 ranked products (from the catalog) with image URLs.
+- In `HWEIBO_PROFILE=real`, `/ai/prompts` requires `HWEIBO_API_KEY` (send via `X-Hweibo-Api-Key` or `Authorization: Bearer ...`).

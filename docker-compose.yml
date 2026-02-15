@@ -23,6 +23,8 @@ services:
       DATABASE_URL: ${DATABASE_URL:-postgresql://hweibo:hweibo_password@db:5432/hweibo}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-flash-latest}
+      HWEIBO_API_KEY: ${HWEIBO_API_KEY:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
     ports:
       - "8000:8000"
     depends_on:

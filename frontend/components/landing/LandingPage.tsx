@@ -2,495 +2,539 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-const backendBase = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
-
-type ApiProduct = {
-  id: number;
-  title: string;
-  description?: string;
-  category?: string;
-  price_cents?: number;
-  currency?: string;
-  images?: string[];
-};
-
-function formatPrice(priceCents?: number, currency?: string) {
-  if (!priceCents) return "TZS 150,000";
-  const code = (currency || "TZS").toUpperCase();
-  const amount = priceCents / 100;
-  const formatted = amount.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  return `${code} ${formatted}`;
-}
-
-function TiltWrap({ children }: { children: ReactNode }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const raf = useRef<number | null>(null);
-
-  const setVars = (rx: number, ry: number, gx: number, gy: number) => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.setProperty("--rx", `${rx}deg`);
-    el.style.setProperty("--ry", `${ry}deg`);
-    el.style.setProperty("--gx", `${gx}%`);
-    el.style.setProperty("--gy", `${gy}%`);
-  };
-
-  const onPointerMove = (e: React.PointerEvent) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const px = (e.clientX - rect.left) / rect.width;
-    const py = (e.clientY - rect.top) / rect.height;
-
-    const ry = (px - 0.5) * 10;
-    const rx = (0.5 - py) * 8;
-
-    const gx = Math.max(0, Math.min(100, px * 100));
-    const gy = Math.max(0, Math.min(100, py * 100));
-
-    if (raf.current) cancelAnimationFrame(raf.current);
-    raf.current = requestAnimationFrame(() => setVars(rx, ry, gx, gy));
-  };
-
-  const onPointerLeave = () => {
-    if (raf.current) cancelAnimationFrame(raf.current);
-    setVars(0, 0, 50, 50);
-  };
-
+// Icons
+function SearchIcon({ className }: { className?: string }) {
   return (
-    <div className="shrink-0 [perspective:1000px]" onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}>
-      <div
-        ref={ref}
-        className="relative will-change-transform"
-        style={{
-          transform:
-            "rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0)",
-          transformStyle: "preserve-3d",
-          transition: "transform 180ms ease",
-        }}
-      >
-        <div
-          className="pointer-events-none absolute -inset-px rounded-[28px] opacity-0 transition-opacity duration-300"
-          style={{
-            background:
-              "radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,0.75), rgba(255,255,255,0) 55%)",
-          }}
-        />
-        <div className="group-hover:opacity-100">{children}</div>
-      </div>
-    </div>
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+    </svg>
   );
 }
 
-function ProductCard({
-  imagePath,
-  category,
-  title,
-  subtitle,
-  store,
-  location,
-  price,
-  ctaHref,
-}: {
-  imagePath: string;
-  category: string;
-  title: string;
-  subtitle: string;
-  store: string;
-  location: string;
-  price: string;
-  ctaHref: string;
-}) {
+function StoreIcon({ className }: { className?: string }) {
   return (
-    <div className="w-[320px] overflow-hidden rounded-[28px] border border-zinc-200 bg-white">
-      <div className="relative overflow-hidden">
-        <img
-          src={`${backendBase}${imagePath}`}
-          onError={(e) => {
-            // Fallback to local Next public assets when backend is not running.
-            e.currentTarget.src = imagePath;
-          }}
-          alt={title}
-          className="h-64 w-full object-cover"
-          loading="lazy"
-        />
-        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 px-5 pb-4">
-          <div className="text-2xl font-medium tracking-tight text-white">{title}</div>
-          <div className="mt-1 text-sm text-white/80">{subtitle}</div>
-        </div>
-      </div>
-
-      <div className="px-5 pb-5 pt-4">
-        <div className="text-[11px] font-extrabold uppercase tracking-[0.35em] text-zinc-400">
-          {category}
-        </div>
-
-        <div className="mt-3 grid gap-2 text-sm text-zinc-700">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100">
-              <span className="text-[11px]">🏬</span>
-            </span>
-            <span className="font-medium">{store}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100">
-              <span className="text-[11px]">📍</span>
-            </span>
-            <span className="truncate">{location}</span>
-          </div>
-        </div>
-
-        <div className="mt-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex h-7 items-center rounded-full border border-zinc-200 bg-white px-2 text-[12px] font-extrabold text-black">
-              {(price.split(" ")[0] || "TZS").toUpperCase()}
-            </span>
-            <span className="text-xl font-semibold tracking-tight text-black">
-              {price.split(" ").slice(1).join(" ") || price}
-            </span>
-          </div>
-          <Link
-            href={ctaHref}
-            className="inline-flex h-9 items-center justify-center rounded-full bg-black px-4 text-sm font-semibold text-white transition hover:bg-black/90"
-          >
-            Add to Cart
-          </Link>
-        </div>
-      </div>
-    </div>
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.617A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.617m-16.5 0V13.5C1.5 10.302 3.802 8.25 6.75 8.25h.75c2.948 0 5.25 2.052 5.25 5.25v2.25" />
+    </svg>
   );
 }
 
-function RollingRail({
-  items,
-  seconds,
-}: {
-  items: Array<{
-    imagePath: string;
-    category: string;
-    title: string;
-    subtitle: string;
-    store: string;
-    location: string;
-    price: string;
-  }>;
-  seconds: number;
-}) {
-  // Duplicate items for a seamless loop.
-  const doubled = useMemo(() => [...items, ...items], [items]);
+function LocationIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+    </svg>
+  );
+}
+
+function ArrowRightIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+    </svg>
+  );
+}
+
+function PaperAirplaneIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+    </svg>
+  );
+}
+
+function SparklesIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+    </svg>
+  );
+}
+
+function CurrencyDollarIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+}
+
+function ShieldCheckIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+    </svg>
+  );
+}
+
+function ChatBubbleLeftRightIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.18.063-2.354.193-3.503.389-1.18.21-2.015.98-2.031 2.094v4.286c0 1.136.847 2.1 1.98 2.193.34.027.68.052 1.02.072v3.091l3-3c1.354 0 2.694-.055 4.02-.163a2.115 2.115 0 01.825.242M4.5 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.18.063-2.354.193-3.503.389-1.18.21-2.015.98-2.031 2.094v4.286c0 1.136.847 2.1 1.98 2.193.34.027.68.052 1.02.072v3.091l3-3c1.354 0 2.694-.055 4.02-.163a2.115 2.115 0 01.825.242" />
+    </svg>
+  );
+}
+
+// Products data - only 5
+const products = [
+  {
+    image: "/product_images/shoes/nike-airmax-90.webp",
+    title: "Nike Air Max 90",
+    price: "450k",
+    store: "Sport World",
+    location: "Dar es Salaam",
+    description: "Classic Nike Air Max 90 with premium cushioning. Perfect for daily wear and running with breathable mesh upper.",
+  },
+  {
+    image: "/product_images/shoes/puma-sport.jpg",
+    title: "Puma Sport Runner",
+    price: "320k",
+    store: "Athletic Store",
+    location: "Arusha",
+    description: "Lightweight Puma running shoes with breathable mesh upper and responsive foam cushioning.",
+  },
+  {
+    image: "/product_images/shoes/new-balance-wake-up.webp",
+    title: "New Balance Fresh Foam",
+    price: "520k",
+    store: "Premium Shoes",
+    location: "Dodoma",
+    description: "New Balance Fresh Foam technology for ultimate comfort and support during long runs and daily activities.",
+  },
+  {
+    image: "/product_images/shoes/galaxy-5-trainers-with-laces.jpg",
+    title: "Adidas Galaxy 5",
+    price: "280k",
+    store: "Sport Center",
+    location: "Mwanza",
+    description: "Adidas Galaxy 5 trainers with Cloudfoam midsole for step-in comfort and all-day wear.",
+  },
+  {
+    image: "/product_images/shoes/Nike-Air-Max-Plus.webp",
+    title: "Nike Air Max Plus",
+    price: "680k",
+    store: "Nike Store TZ",
+    location: "Dar es Salaam",
+    description: "Iconic Air Max Plus with Tuned Air technology and bold gradient design. Premium comfort.",
+  },
+];
+
+// Animated AI Search Section
+function AnimatedSearchSection() {
+  const [currentPrompt, setCurrentPrompt] = useState("");
+  const [promptIndex, setPromptIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [searchStep, setSearchStep] = useState(0);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+  const searchPrompts = [
+    "Show me running shoes under 500k...",
+    "Find me sneakers from Nike or Adidas...",
+    "Looking for casual wear for developers...",
+    "Premium sport shoes with good reviews...",
+  ];
+
+  useEffect(() => {
+    if (isPaused || showResults) return;
+
+    const typeSpeed = isDeleting ? 40 : 90;
+    const currentFullPrompt = searchPrompts[promptIndex];
+
+    const timeout = setTimeout(() => {
+      if (!isDeleting && currentPrompt !== currentFullPrompt) {
+        setCurrentPrompt(currentFullPrompt.slice(0, currentPrompt.length + 1));
+      } else if (!isDeleting && currentPrompt === currentFullPrompt) {
+        setIsPaused(true);
+        setTimeout(() => {
+          setIsPaused(false);
+          setSearchStep(1);
+          setTimeout(() => setSearchStep(2), 1000);
+          setTimeout(() => setSearchStep(3), 2000);
+          setTimeout(() => {
+            setShowResults(true);
+          }, 3000);
+        }, 800);
+      } else if (isDeleting && currentPrompt !== "") {
+        setCurrentPrompt(currentPrompt.slice(0, -1));
+      } else if (isDeleting && currentPrompt === "") {
+        setIsDeleting(false);
+        setPromptIndex((prev) => (prev + 1) % searchPrompts.length);
+        setShowResults(false);
+        setSearchStep(0);
+        setExpandedIndex(null);
+      }
+    }, typeSpeed);
+
+    return () => clearTimeout(timeout);
+  }, [currentPrompt, isDeleting, isPaused, promptIndex, showResults]);
+
+  useEffect(() => {
+    if (showResults) {
+      const timeout = setTimeout(() => {
+        setShowResults(false);
+        setSearchStep(0);
+        setIsDeleting(true);
+        setExpandedIndex(null);
+      }, 30000);
+      return () => clearTimeout(timeout);
+    }
+  }, [showResults]);
 
   return (
-    <div className="relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white to-transparent" />
-      <div
-        className="flex w-[200%] gap-6 py-2"
-        style={{
-          animation: `carousel ${seconds}s linear infinite`,
-        }}
-      >
-        {doubled.map((item, idx) => (
-          <div key={`${item.title}-${idx}`} className="group shrink-0">
-            <TiltWrap>
-              <div className="transition-transform duration-300 group-hover:-translate-y-1">
-                <ProductCard {...item} ctaHref="/auth/login" />
+    <div className="w-full max-w-2xl mx-auto">
+      {/* Search Bar - Compact with send icon */}
+      <div className="relative bg-white rounded-full border border-zinc-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="flex items-center px-4 sm:px-5 py-3 sm:py-3.5">
+          <SearchIcon className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400 mr-3" />
+          <div className="flex-1 text-left min-w-0 overflow-hidden">
+            {!showResults ? (
+              <span className="text-zinc-900 text-sm sm:text-base whitespace-nowrap">
+                {currentPrompt}
+                <span 
+                  className="inline-block w-[2px] h-5 sm:h-6 bg-zinc-900 ml-0.5 align-middle"
+                  style={{ animation: 'cursor-blink 0.8s ease-in-out infinite' }}
+                />
+              </span>
+            ) : (
+              <span className="text-zinc-900 text-sm sm:text-base">{currentPrompt}</span>
+            )}
+          </div>
+          <button className="p-1.5 sm:p-2 bg-zinc-100 hover:bg-zinc-200 rounded-full transition-colors ml-2">
+            <PaperAirplaneIcon className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-700" />
+          </button>
+        </div>
+      </div>
+
+      {/* Search Progress */}
+      {searchStep > 0 && !showResults && (
+        <div className="mt-4 flex items-center justify-center gap-2 text-xs sm:text-sm text-zinc-500">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-zinc-900 rounded-full animate-pulse" />
+            {searchStep === 1 && (
+              <>
+                <span>Searching market</span>
+                <span className="flex gap-0.5">
+                  <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                  <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                  <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                </span>
+              </>
+            )}
+            {searchStep === 2 && (
+              <>
+                <span>Finding best prices</span>
+                <span className="flex gap-0.5">
+                  <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                  <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                  <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                </span>
+              </>
+            )}
+            {searchStep === 3 && (
+              <>
+                <span>Combining results</span>
+                <span className="flex gap-0.5">
+                  <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                  <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                  <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* AI Results - 5 horizontal cards */}
+      {showResults && (
+        <div className="mt-8 animate-fade-in">
+          <div className="flex items-center justify-center gap-2 mb-6 text-xs sm:text-sm text-zinc-500">
+            <SparklesIcon className="w-4 h-4 text-zinc-900" />
+            <span>Found 5 matching products from 12 sellers</span>
+          </div>
+          
+          <div className="space-y-3">
+            {products.map((product, idx) => (
+              <div 
+                key={idx}
+                className={`bg-white border-2 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 ${
+                  expandedIndex === idx ? 'border-zinc-900 shadow-xl' : 'border-zinc-200 hover:border-zinc-400'
+                }`}
+                onClick={() => setExpandedIndex(expandedIndex === idx ? null : idx)}
+              >
+                {expandedIndex !== idx ? (
+                  // Collapsed - Horizontal card
+                  <div className="flex items-center p-3 sm:p-4">
+                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden">
+                      <img
+                        src={product.image}
+                        alt={product.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 ml-4 min-w-0">
+                      <h3 className="font-bold text-zinc-900 text-base sm:text-lg truncate">{product.title}</h3>
+                      <p className="text-zinc-500 text-sm mt-0.5 truncate">{product.store}</p>
+                    </div>
+                    <div className="ml-4 flex-shrink-0">
+                      <span className="bg-zinc-900 text-white text-sm font-bold px-3 py-1.5 rounded-full">
+                        {product.price}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  // Expanded - Full details
+                  <div className="p-4 sm:p-5">
+                    <div className="flex items-start gap-4">
+                      <div className="relative w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 rounded-xl overflow-hidden">
+                        <img
+                          src={product.image}
+                          alt={product.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="font-bold text-zinc-900 text-xl">{product.title}</h3>
+                          <button 
+                            className="p-1 hover:bg-zinc-100 rounded-full transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedIndex(null);
+                            }}
+                          >
+                            <svg className="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                        <p className="text-zinc-600 text-sm mt-2">{product.description}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4 pt-4 border-t border-zinc-100">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-500">
+                          <span className="flex items-center gap-1.5">
+                            <StoreIcon className="w-4 h-4" />
+                            {product.store}
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <LocationIcon className="w-4 h-4 text-red-500" />
+                            {product.location}
+                          </span>
+                        </div>
+                        <span className="bg-zinc-900 text-white text-lg font-bold px-4 py-2 rounded-full">
+                          TZS {product.price}
+                          </span>
+                      </div>
+                    </div>
+
+                    <button className="mt-4 w-full bg-zinc-900 text-white font-semibold py-3 rounded-xl hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2">
+                      View Full Details
+                      <ArrowRightIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
-            </TiltWrap>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        @keyframes cursor-blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+      `}</style>
     </div>
   );
 }
 
-function HowItWorksCard({
-  title,
-  description,
-  icon,
-}: {
-  title: string;
-  description: string;
-  icon: ReactNode;
-}) {
+function HeaderLink({ href, children, variant = "default" }: { href: string; children: ReactNode; variant?: "default" | "button" }) {
+  if (variant === "button") {
+    return (
+      <Link
+        href={href}
+        className="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-900 text-white text-sm font-medium rounded-full hover:bg-zinc-800 transition-all"
+      >
+        {children}
+      </Link>
+    );
+  }
+  
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-6">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-black text-white">
-        {icon}
-      </div>
-      <div className="mt-6 text-xl font-bold text-black">{title}</div>
-      <div className="mt-3 text-sm leading-6 text-zinc-500">{description}</div>
-    </div>
+    <Link
+      href={href}
+      className="group relative inline-block text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900"
+    >
+      <span>{children}</span>
+      <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-zinc-900 transition-all duration-300 group-hover:w-full" />
+    </Link>
+  );
+}
+
+function FooterLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="group relative inline-block text-zinc-400 transition-colors hover:text-white"
+    >
+      <span>{children}</span>
+      <span className="absolute bottom-0 left-0 h-px w-0 bg-white transition-all duration-300 group-hover:w-full" />
+    </Link>
   );
 }
 
 export function LandingPage() {
-  const fallback: ApiProduct[] = useMemo(
-    () => [
-      {
-        id: 1,
-        title: "Lenovo IdeaPad",
-        description: "A minimalist daily-driver laptop with clean performance and a slim profile.",
-        category: "Laptops",
-        images: ["/product_images/laptops/lenovo-idea-pad.avif"],
-      },
-      {
-        id: 2,
-        title: "MacBook Pro 16",
-        description: "Powerful, refined, and fast for demanding creative and development work.",
-        category: "Laptops",
-        images: ["/product_images/laptops/macbook-pro-16.jpg"],
-      },
-      {
-        id: 3,
-        title: "Dell XPS 17",
-        description: "A clean, premium build with a large display and strong performance.",
-        category: "Laptops",
-        images: ["/product_images/laptops/xps-17.avif"],
-      },
-      {
-        id: 4,
-        title: "Nike Air Max 720",
-        description: "Comfort-first style built for everyday steps.",
-        category: "Shoes",
-        images: ["/product_images/shoes/nke-air-max-720-black.webp"],
-      },
-      {
-        id: 5,
-        title: "Puma Sport",
-        description: "Simple and durable sneaker for daily wear.",
-        category: "Shoes",
-        images: ["/product_images/shoes/puma-sport.jpg"],
-      },
-    ],
-    [],
-  );
-
-  const [products, setProducts] = useState<ApiProduct[]>(fallback);
+  const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      try {
-        const res = await fetch(`${backendBase}/products?limit=20`, { cache: "no-store" });
-        if (!res.ok) return;
-        const data = (await res.json()) as ApiProduct[];
-        if (!cancelled && Array.isArray(data) && data.length > 0) setProducts(data);
-      } catch {
-        // Keep fallback.
-      }
-    };
-    load();
-    return () => {
-      cancelled = true;
-    };
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const railItems = useMemo(() => {
-    const mapped = products
-      .map((p) => {
-        const imagePath = p.images?.[0];
-        if (!imagePath) return null;
-        return {
-          imagePath,
-          category: p.category || "Product",
-          title: p.title,
-          subtitle: (p.description || "").slice(0, 26) || "Minimalist pick.",
-          store: "Lark Stores, Inc.",
-          location: "Nyerere Sq., Dodoma",
-          price: formatPrice(p.price_cents, p.currency || "TZS"),
-        };
-      })
-      .filter(Boolean) as Array<{
-        imagePath: string;
-        category: string;
-        title: string;
-        subtitle: string;
-        store: string;
-        location: string;
-        price: string;
-      }>;
-
-    // Ensure we have enough cards for a smooth rail.
-    if (mapped.length >= 6) return mapped;
-    return [...mapped, ...mapped, ...mapped].slice(0, 9);
-  }, [products]);
+  const heroScale = Math.max(0.9, 1 - scrollY * 0.0003);
+  const heroOpacity = Math.max(0.3, 1 - scrollY * 0.001);
 
   return (
-    <div className="bg-white text-black">
-      <section className="relative overflow-hidden pt-28">
-        <div className="pointer-events-none absolute left-1/2 top-16 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,0,0,0.10),rgba(0,0,0,0)_62%)] blur-2xl" />
-        <div className="pointer-events-none absolute -left-24 top-20 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(0,0,0,0.08),rgba(0,0,0,0)_65%)] blur-2xl" />
-        <div className="pointer-events-none absolute -right-24 top-28 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(0,0,0,0.08),rgba(0,0,0,0)_65%)] blur-2xl" />
+    <div className="bg-white text-zinc-900">
+      <style jsx global>{`
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
 
-        <div className="mx-auto w-[min(92%,1100px)] text-center">
-          <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-zinc-50 px-4 py-2 text-[11px] font-extrabold uppercase tracking-[0.35em] text-zinc-500 ring-1 ring-zinc-200">
-            <span className="h-2 w-2 rounded-full bg-zinc-400" />
-            The future of commerce
-          </div>
-
-          <h1 className="mt-6 text-5xl font-extrabold leading-[1.02] tracking-tight sm:text-6xl">
-            <span className="text-black">Shop smarter</span>
-            <br />
-            <span className="text-zinc-400">with Hweibo.</span>
-          </h1>
-
-          <p className="mx-auto mt-6 max-w-2xl text-base font-medium leading-7 text-zinc-500 sm:text-lg">
-            A minimalist AI-powered shopping platform designed for the modern lifestyle. Effortless
-            discovery meets sophisticated design.
-          </p>
-
-          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/auth"
-              className="inline-flex h-14 items-center justify-center gap-3 rounded-full bg-black px-8 text-base font-bold text-white shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] transition hover:bg-black/90"
-            >
-              Get Started
-              <span aria-hidden className="inline-block">
-                →
-              </span>
+      {/* Header with Auth Buttons */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-zinc-200">
+        <div className="mx-auto w-[min(92%,1200px)] px-4">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="text-xl font-bold text-zinc-900">
+              Hweibo
             </Link>
-            <Link
-              href="#how-it-works"
-              className="inline-flex h-14 items-center justify-center rounded-full px-8 text-base font-bold text-black ring-1 ring-zinc-200 transition hover:bg-zinc-50"
-            >
-              Learn more
-            </Link>
-          </div>
-
-          <div className="mt-6 flex flex-col items-center justify-center gap-2 text-sm text-zinc-500 sm:flex-row">
-            <span>Already have an account?</span>
-            <Link href="/auth/login" className="font-semibold text-black underline underline-offset-4">
-              Login
-            </Link>
-            <span className="hidden sm:inline">·</span>
-            <Link href="/auth/register" className="font-semibold text-black underline underline-offset-4">
-              Sign up
-            </Link>
-          </div>
-
-          <div className="mx-auto mt-10 w-full max-w-3xl">
-            <div className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-white px-6 py-5 text-left">
-              <div className="pointer-events-none absolute inset-0">
-                <div className="absolute -left-10 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-black/5 blur-2xl" />
-                <div className="absolute -right-10 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-black/5 blur-2xl" />
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-black/30 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-black/15 to-transparent" />
-              </div>
-
-              <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <div className="inline-flex items-center gap-2 rounded-full bg-zinc-50 px-3 py-1 text-xs font-extrabold uppercase tracking-[0.3em] text-zinc-500 ring-1 ring-zinc-200">
-                    <span className="inline-block h-2 w-2 rounded-full bg-black/60" />
-                    Sponsored AI picks
-                  </div>
-                  <div className="mt-3 text-lg font-semibold text-black">
-                    Gemini-assisted discovery, curated for clean results.
-                  </div>
-                  <div className="mt-1 text-sm text-zinc-600">
-                    Describe what you want. Hweibo suggests products instantly.
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Link
-                    href="/auth/register"
-                    className="inline-flex h-10 items-center justify-center rounded-full bg-black px-5 text-sm font-semibold text-white transition hover:bg-black/90"
-                  >
-                    Try AI Search
-                  </Link>
-                  <Link
-                    href="/auth/login"
-                    className="inline-flex h-10 items-center justify-center rounded-full px-5 text-sm font-semibold text-black ring-1 ring-zinc-200 transition hover:bg-zinc-50"
-                  >
-                    Sign in
-                  </Link>
-                </div>
-              </div>
+            <div className="flex items-center gap-6">
+              <HeaderLink href="/auth/register">Sign Up</HeaderLink>
+              <HeaderLink href="/auth/login" variant="button">Log in</HeaderLink>
             </div>
           </div>
         </div>
+      </header>
 
-        <div className="mx-auto mt-14 w-[min(98%,1400px)]">
-          <RollingRail items={railItems} seconds={42} />
+      {/* Hero Section */}
+      <section className="relative min-h-screen overflow-hidden pt-16">
+        <div 
+          className="relative z-10 flex min-h-[calc(100vh-64px)] items-center justify-center" 
+          style={{ transform: `scale(${heroScale})`, opacity: heroOpacity, transition: "transform 0.1s ease-out, opacity 0.1s ease-out" }}
+        >
+          <div className="mx-auto w-[min(92%,900px)] text-center px-4">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight tracking-tight cursor-pointer select-none text-zinc-900">
+              Hweibo
+            </h1>
+            <p className="mx-auto mt-4 max-w-xl text-lg text-zinc-600">
+              AI-powered shopping. Describe what you need, find what you want.
+            </p>
+            
+            {/* Animated Search Section */}
+            <div className="mt-10">
+              <AnimatedSearchSection />
+            </div>
+          </div>
         </div>
       </section>
 
-      <section id="how-it-works" className="mt-20 border-y border-zinc-100 bg-zinc-50 py-16">
-        <div className="mx-auto w-[min(92%,1100px)]">
-          <div className="text-center">
-            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">How it works</h2>
-            <p className="mt-3 text-base text-zinc-500">
-              Simple, minimalist, and efficient shopping.
+      {/* What Hweibo Does Section */}
+      <section className="py-20 bg-zinc-50 border-y border-zinc-200">
+        <div className="mx-auto w-[min(92%,1100px)] px-4">
+          <div className="mb-16 text-center">
+            <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 mb-4">
+              Hweibo Finds the Best Deals For You
+            </h2>
+            <p className="text-zinc-600 text-lg max-w-2xl mx-auto">
+              Stop comparing prices across dozens of websites. Our AI does the work for you.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            <HowItWorksCard
-              title="Describe"
-              description={
-                "Tell Hweibo AI exactly what you are looking for in natural language. From style to specific technical features."
-              }
-              icon={
-                <svg width="22" height="22" viewBox="0 0 29 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M2.33496 28.675V7.66005C2.33496 7.01792 2.5636 6.46823 3.02087 6.01095C3.47814 5.55368 4.02784 5.32505 4.66996 5.32505H23.35C23.9921 5.32505 24.5418 5.55368 24.9991 6.01095C25.4563 6.46823 25.685 7.01792 25.685 7.66005V21.67C25.685 22.3122 25.4563 22.8619 24.9991 23.3191C24.5418 23.7764 23.9921 24.005 23.35 24.005H7.00496L2.33496 28.675ZM6.01259 21.67H23.35V7.66005H4.66996V22.9835L6.01259 21.67Z"
-                    fill="white"
-                  />
-                </svg>
-              }
-            />
-            <HowItWorksCard
-              title="Curate"
-              description={
-                "Our AI scans thousands of products across the web to find your perfect matches instantly. No more scrolling."
-              }
-              icon={
-                <svg width="22" height="22" viewBox="0 0 29 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M22.1825 13.4975L20.7231 10.2869L17.5125 8.82753L20.7231 7.36815L22.1825 4.15753L23.6419 7.36815L26.8525 8.82753L23.6419 10.2869L22.1825 13.4975ZM10.5075 26.34L7.58873 19.9188L1.16748 17L7.58873 14.0813L10.5075 7.66003L13.4262 14.0813L19.8475 17L13.4262 19.9188L10.5075 26.34Z"
-                    fill="white"
-                  />
-                </svg>
-              }
-            />
-            <HowItWorksCard
-              title="Purchase"
-              description={
-                "Complete your purchase seamlessly with our integrated one-click checkout. Secure, fast, and unified."
-              }
-              icon={
-                <svg width="22" height="22" viewBox="0 0 29 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M1.16748 7.66005V5.32505H4.99104L9.95292 15.8325H18.1254L22.6787 7.66005H25.3347L20.1977 16.9417C19.9837 17.3308 19.6967 17.6324 19.3367 17.8465C18.9767 18.0605 18.5827 18.1675 18.1546 18.1675H9.45673L8.17248 20.5025H22.1825V22.8375H8.17248C7.29686 22.8375 6.63041 22.4581 6.17314 21.6992C5.71587 20.9404 5.70127 20.1718 6.12936 19.3934L7.70548 16.533L3.50248 7.66005H1.16748Z"
-                    fill="white"
-                  />
-                </svg>
-              }
-            />
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-2xl border border-zinc-200">
+              <div className="w-12 h-12 bg-zinc-100 rounded-xl flex items-center justify-center mb-5">
+                <ChatBubbleLeftRightIcon className="w-6 h-6 text-zinc-900" />
+              </div>
+              <h3 className="text-xl font-bold text-zinc-900 mb-3">Natural Language Search</h3>
+              <p className="text-zinc-600 leading-relaxed">
+                Describe exactly what you need in plain English. "I want running shoes under 500k" and Hweibo understands.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl border border-zinc-200">
+              <div className="w-12 h-12 bg-zinc-100 rounded-xl flex items-center justify-center mb-5">
+                <CurrencyDollarIcon className="w-6 h-6 text-zinc-900" />
+              </div>
+              <h3 className="text-xl font-bold text-zinc-900 mb-3">Price Comparison Across Sellers</h3>
+              <p className="text-zinc-600 leading-relaxed">
+                We check prices from verified local stores in Dar es Salaam, Arusha, Dodoma, and Mwanza.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl border border-zinc-200">
+              <div className="w-12 h-12 bg-zinc-100 rounded-xl flex items-center justify-center mb-5">
+                <ShieldCheckIcon className="w-6 h-6 text-zinc-900" />
+              </div>
+              <h3 className="text-xl font-bold text-zinc-900 mb-3">Verified Local Sellers</h3>
+              <p className="text-zinc-600 leading-relaxed">
+                Every seller is verified and rated. Shop with confidence from trusted local businesses.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto mt-20 w-[min(92%,1100px)] rounded-[40px] bg-black px-8 py-16 text-center text-white shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)]">
-        <h2 className="text-4xl font-extrabold leading-[1.05] sm:text-5xl">
-          Ready to transform your
-          <br />
-          shopping?
-        </h2>
-        <p className="mx-auto mt-6 max-w-2xl text-base text-zinc-300 sm:text-lg">
-          Join thousands of users shopping smarter every day with the most minimalist AI experience.
-        </p>
-        <div className="mt-10">
-          <Link
-            href="/auth/register"
-            className="inline-flex h-16 items-center justify-center rounded-full bg-white px-10 text-base font-bold text-black transition hover:bg-zinc-100"
-          >
-            Get Started Now
-          </Link>
+      {/* Footer */}
+      <footer className="w-full bg-zinc-950">
+        <div className="mx-auto w-full max-w-7xl px-8 py-12">
+          <div className="grid gap-8 md:grid-cols-4">
+            <div>
+              <h3 className="text-lg font-medium font-sans text-white">hweibo</h3>
+              <p className="mt-2 text-sm text-zinc-500">AI-powered shopping for everyone.</p>
+            </div>
+            <div>
+              <h4 className="text-sm font-medium text-white">Product</h4>
+              <ul className="mt-4 space-y-2 text-sm">
+                <li><FooterLink href="/products">Products</FooterLink></li>
+                <li><FooterLink href="/categories">Categories</FooterLink></li>
+                <li><FooterLink href="/deals">Deals</FooterLink></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-sm font-medium text-white">Company</h4>
+              <ul className="mt-4 space-y-2 text-sm">
+                <li><FooterLink href="/about">About</FooterLink></li>
+                <li><FooterLink href="/careers">Careers</FooterLink></li>
+                <li><FooterLink href="/contact">Contact</FooterLink></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-sm font-medium text-white">Legal</h4>
+              <ul className="mt-4 space-y-2 text-sm">
+                <li><FooterLink href="/privacy">Privacy</FooterLink></li>
+                <li><FooterLink href="/terms">Terms</FooterLink></li>
+                <li><FooterLink href="/cookies">Cookies</FooterLink></li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-12 border-t border-zinc-800 pt-8">
+            <p className="text-center text-sm text-zinc-600">© 2025 Hweibo. All rights reserved.</p>
+          </div>
         </div>
-      </section>
+      </footer>
     </div>
   );
 }

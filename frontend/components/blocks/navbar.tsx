@@ -22,7 +22,7 @@ export const Navbar = () => {
               />
             </svg>
           </span>
-          <span className="text-lg font-extrabold tracking-tight text-black">Hweibo</span>
+          <span className="text-lg font-medium font-sans tracking-tight text-black">hweibo</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">

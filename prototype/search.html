@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search - Hweibo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen bg-white" data-proto-active="search">
+  <!-- Sidebar -->
+  <a href="index.html" class="fixed left-4 sm:left-6 top-6 z-50 text-sm sm:text-base font-medium font-sans tracking-[0.18em] text-zinc-800 hover:text-black transition-all duration-300">
+    hweibo
+  </a>
+
+  <div class="fixed left-4 sm:left-6 top-1/2 -translate-y-1/2 z-50">
+    <nav data-proto-nav="buyers" class="flex flex-col items-start">
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="search" href="search.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span>Search</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="browse" href="browse.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          <span>Browse</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="orders" href="orders.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>Orders</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="wallet" href="wallet.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+          <span>Wallet</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="cart" href="checkout.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          <span>Cart</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="profile" href="profile.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="min-h-screen flex flex-col">
+    <main class="flex-1 overflow-y-auto">
+      <div class="max-w-[896px] mx-auto px-4 py-8 pl-24 sm:pl-32">
+        <!-- Chat Messages -->
+        <div class="space-y-6">
+          <!-- User Message -->
+          <div class="flex flex-col items-end">
+            <span class="text-xs font-bold uppercase tracking-wider text-black/40 mb-2 px-2">You</span>
+            <div class="max-w-[80%] px-6 py-4 bg-white border border-black/10 rounded-[18px] rounded-tr-[10px] shadow-sm">
+              <p class="text-base text-black">I am looking for a pc under 2m TZS</p>
+            </div>
+          </div>
+
+          <!-- AI Message -->
+          <div class="flex flex-col items-start">
+            <span class="text-xs font-bold uppercase tracking-wider text-black/40 mb-2 px-2">Hweibo AI</span>
+            <div class="max-w-[80%] px-6 py-4 bg-zinc-100 rounded-[18px] rounded-tl-[10px]">
+              <p class="text-base text-black">Here are 5 ranked matches (fallback mode):</p>
+            </div>
+          </div>
+
+          <!-- Products -->
+          <div class="mt-6 w-full">
+            <div class="flex items-center gap-2 mb-4 text-sm text-zinc-500 px-2">
+              <span>Found 5 matching products</span>
+            </div>
+            <div class="space-y-3">
+              <!-- Product 1 -->
+              <div class="bg-white border-2 border-zinc-900 shadow-xl rounded-2xl overflow-hidden">
+                <div class="flex items-center p-3 sm:p-4">
+                  <div class="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden bg-zinc-50 border border-zinc-200">
+                    <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca4?w=200&h=200&fit=crop" alt="MacBook" class="w-full h-full object-cover">
+                    <div class="absolute top-1.5 left-1.5 bg-black text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-tight">TOP PICK</div>
+                  </div>
+                  <div class="flex-1 ml-4 min-w-0">
+                    <h3 class="font-bold text-zinc-900 text-base sm:text-lg truncate">MacBook Pro 16-inch</h3>
+                    <p class="text-zinc-500 text-sm mt-0.5 truncate">Hweibo Store · Dodoma</p>
+                  </div>
+                  <div class="ml-4 flex-shrink-0">
+                    <span class="bg-zinc-900 text-white text-sm font-bold px-3 py-1.5 rounded-full">TZS 220k</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Product 2 -->
+              <div class="bg-white border-2 border-zinc-200 rounded-2xl overflow-hidden hover:border-zinc-400 hover:shadow-md transition-all cursor-pointer">
+                <div class="flex items-center p-3 sm:p-4">
+                  <div class="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden bg-zinc-50 border border-zinc-200">
+                    <img src="https://images.unsplash.com/photo-1593642632823-8f78536788c6?w=200&h=200&fit=crop" alt="Dell" class="w-full h-full object-cover">
+                    <div class="absolute top-1.5 left-1.5 bg-black text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-tight">BEST DISPLAY</div>
+                  </div>
+                  <div class="flex-1 ml-4 min-w-0">
+                    <h3 class="font-bold text-zinc-900 text-base sm:text-lg truncate">Dell XPS 17</h3>
+                    <p class="text-zinc-500 text-sm mt-0.5 truncate">Hweibo Store · Arusha</p>
+                  </div>
+                  <div class="ml-4 flex-shrink-0">
+                    <span class="bg-zinc-900 text-white text-sm font-bold px-3 py-1.5 rounded-full">TZS 190k</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Product 3 -->
+              <div class="bg-white border-2 border-zinc-200 rounded-2xl overflow-hidden hover:border-zinc-400 hover:shadow-md transition-all cursor-pointer">
+                <div class="flex items-center p-3 sm:p-4">
+                  <div class="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden bg-zinc-50 border border-zinc-200">
+                    <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop" alt="Nike" class="w-full h-full object-cover">
+                  </div>
+                  <div class="flex-1 ml-4 min-w-0">
+                    <h3 class="font-bold text-zinc-900 text-base sm:text-lg truncate">Nike Airmax 90</h3>
+                    <p class="text-zinc-500 text-sm mt-0.5 truncate">Sport World · Dar es Salaam</p>
+                  </div>
+                  <div class="ml-4 flex-shrink-0">
+                    <span class="bg-zinc-900 text-white text-sm font-bold px-3 py-1.5 rounded-full">TZS 16k</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Product 4 -->
+              <div class="bg-white border-2 border-zinc-200 rounded-2xl overflow-hidden hover:border-zinc-400 hover:shadow-md transition-all cursor-pointer">
+                <div class="flex items-center p-3 sm:p-4">
+                  <div class="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden bg-zinc-50 border border-zinc-200">
+                    <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=200&h=200&fit=crop" alt="Puma" class="w-full h-full object-cover">
+                    <div class="absolute top-1.5 left-1.5 bg-black text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-tight">BEST VALUE</div>
+                  </div>
+                  <div class="flex-1 ml-4 min-w-0">
+                    <h3 class="font-bold text-zinc-900 text-base sm:text-lg truncate">Puma Sport Runner</h3>
+                    <p class="text-zinc-500 text-sm mt-0.5 truncate">Athletic Store · Mwanza</p>
+                  </div>
+                  <div class="ml-4 flex-shrink-0">
+                    <span class="bg-zinc-900 text-white text-sm font-bold px-3 py-1.5 rounded-full">TZS 13k</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Product 5 -->
+              <div class="bg-white border-2 border-zinc-200 rounded-2xl overflow-hidden hover:border-zinc-400 hover:shadow-md transition-all cursor-pointer">
+                <div class="flex items-center p-3 sm:p-4">
+                  <div class="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden bg-zinc-50 border border-zinc-200">
+                    <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200&h=200&fit=crop" alt="Lenovo" class="w-full h-full object-cover">
+                  </div>
+                  <div class="flex-1 ml-4 min-w-0">
+                    <h3 class="font-bold text-zinc-900 text-base sm:text-lg truncate">Lenovo IdeaPad</h3>
+                    <p class="text-zinc-500 text-sm mt-0.5 truncate">Hweibo Store · Dar es Salaam</p>
+                  </div>
+                  <div class="ml-4 flex-shrink-0">
+                    <span class="bg-zinc-900 text-white text-sm font-bold px-3 py-1.5 rounded-full">TZS 75k</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Search Input -->
+    <footer class="bg-white border-t border-black/10 p-4">
+      <div class="max-w-[896px] mx-auto">
+        <div class="flex items-center bg-white rounded-full border border-black/10 shadow-sm px-4 py-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-black/40"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" placeholder="Describe what you're looking for..." class="flex-1 ml-4 py-3 text-base text-black placeholder:text-black/30 focus:outline-none bg-transparent">
+          <button class="w-10 h-10 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
+  <script defer src="proto-nav.js"></script>
+</body>
+</html>

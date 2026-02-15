@@ -1,0 +1,10 @@
+postgres@fedora:~$ psql
+psql (18.1)
+Type "help" for help.
+
+postgres=# CREATE USER hweibo WITH PASSWORD 'benoir,rir,i';
+CREATE ROLE
+postgres=# CREATE DATABASE hweibo OWNER hweibo;
+CREATE DATABASE
+postgres=# \q
+postgres@fedora:~$

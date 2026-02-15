@@ -13,6 +13,10 @@ package-lock.json
 .venv/
 venv/
 
+# Python bytecode
+__pycache__/
+*.py[cod]
+
 # IDE and system clutter
 .DS_Store
 .idea/
@@ -35,3 +39,11 @@ backend/.env
 
 # Local scratch
 sample/
+
+# WhatsApp bot auth/session and logs
+whatsapp_bot/.wwebjs_auth/
+whatsapp_bot/.wwebjs_cache/
+whatsapp_bot/logs/
+
+# agent_shopper contains historical experiments and may include secrets; keep it out of this repo
+agent_shopper/

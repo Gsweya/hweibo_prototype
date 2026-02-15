@@ -1,4 +1,3 @@
-import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
@@ -54,11 +53,6 @@ const dmSans = localFont({
   ],
   variable: "--font-dm-sans",
   display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
@@ -120,7 +114,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${dmSans.variable} ${inter.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${dmSans.variable}`}>
       <head>
         <script
           async
@@ -136,9 +130,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           disableTransitionOnChange
         >
           <StyleGlideProvider />
-          <Navbar />
           <main>{children}</main>
-          <Footer />
         </ThemeProvider>
       </body>
     </html>

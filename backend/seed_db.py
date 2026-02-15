@@ -19,6 +19,7 @@ from sqlmodel import Session, SQLModel, create_engine, select
 
 from app import (
     Plan,
+    SellerProfile,
     Product,
     ProductImage,
     Subscription,
@@ -116,6 +117,20 @@ def main() -> None:
         session.add(admin)
         session.commit()
         session.refresh(seller)
+
+        # 1 seller -> 1 store (profile)
+        session.add(
+            SellerProfile(
+                user_id=seller.id,
+                store_name="Hweibo Demo Store",
+                store_description="Demo seller store for the Hweibo prototype catalog.",
+                store_country_code="TZ",
+                store_region="Dodoma",
+                store_city="Dodoma",
+                store_address="Dodoma, Tanzania",
+            )
+        )
+        session.commit()
 
         plans = [
             Plan(code="starter", name="Starter", price_cents_monthly=0, currency="USD", is_active=True),
