@@ -97,11 +97,11 @@
               </div>
               <div class="flex items-center justify-between mt-4">
                 <div class="flex items-center gap-3">
-                  <button class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center hover:bg-zinc-100">
+                  <button onclick="updateQuantity('item1', -1)" class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
                   </button>
-                  <span class="font-semibold w-8 text-center">1</span>
-                  <button class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center hover:bg-zinc-100">
+                  <span id="qty-item1" class="font-semibold w-8 text-center">1</span>
+                  <button onclick="updateQuantity('item1', 1)" class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                   </button>
                 </div>
@@ -127,11 +127,11 @@
               </div>
               <div class="flex items-center justify-between mt-4">
                 <div class="flex items-center gap-3">
-                  <button class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center hover:bg-zinc-100">
+                  <button onclick="updateQuantity('item2', -1)" class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
                   </button>
-                  <span class="font-semibold w-8 text-center">1</span>
-                  <button class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center hover:bg-zinc-100">
+                  <span id="qty-item2" class="font-semibold w-8 text-center">1</span>
+                  <button onclick="updateQuantity('item2', 1)" class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                   </button>
                 </div>
@@ -202,8 +202,8 @@
           </div>
 
           <!-- Checkout Button -->
-          <button class="w-full h-14 rounded-full bg-black text-white font-bold text-lg hover:bg-zinc-800 transition-colors">
-            Confirm Purchase
+          <button id="checkoutBtn" onclick="processCheckout()" class="w-full h-14 rounded-full bg-black text-white font-bold text-lg hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2">
+            <span>Confirm Purchase</span>
           </button>
 
           <p class="text-center text-xs text-zinc-400 mt-4">Secured by Hweibo 256-bit encryption</p>
@@ -211,6 +211,104 @@
       </div>
     </div>
   </main>
+  
+  <script>
+    // Checkout process
+    function processCheckout() {
+      const btn = document.getElementById('checkoutBtn');
+      const originalText = btn.innerHTML;
+      
+      // Show loading state
+      btn.disabled = true;
+      btn.innerHTML = `
+        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Processing...</span>
+      `;
+      
+      // Simulate processing steps
+      setTimeout(() => {
+        btn.innerHTML = `
+          <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>Authorizing...</span>
+        `;
+      }, 1000);
+      
+      setTimeout(() => {
+        btn.innerHTML = `
+          <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>Confirming...</span>
+        `;
+      }, 2000);
+      
+      // Redirect to success page
+      setTimeout(() => {
+        window.location.href = 'order-success.html';
+      }, 3000);
+    }
+    
+    // Quantity update functions
+    function updateQuantity(item, change) {
+      const qtyElement = document.getElementById('qty-' + item);
+      let currentQty = parseInt(qtyElement.textContent);
+      currentQty += change;
+      
+      if (currentQty < 1) {
+        currentQty = 1;
+      }
+      if (currentQty > 10) {
+        currentQty = 10;
+      }
+      
+      qtyElement.textContent = currentQty;
+      updateTotals();
+    }
+    
+    // Remove item from cart
+    function removeItem(btn) {
+      const item = btn.closest('.flex.gap-4');
+      item.style.opacity = '0';
+      item.style.transform = 'translateX(-20px)';
+      setTimeout(() => {
+        item.remove();
+        checkEmptyCart();
+      }, 300);
+    }
+    
+    // Check if cart is empty
+    function checkEmptyCart() {
+      const items = document.querySelectorAll('.flex.gap-4.p-4');
+      if (items.length === 0) {
+        window.location.href = 'browse.html';
+      }
+    }
+    
+    // Update totals based on quantities
+    function updateTotals() {
+      // In a real app, this would calculate based on actual cart data
+      // For prototype, we'll keep the static values
+    }
+    
+    // Payment method selection
+    document.querySelectorAll('.payment-method').forEach(method => {
+      method.addEventListener('click', function() {
+        document.querySelectorAll('.payment-method').forEach(m => {
+          m.classList.remove('border-black');
+          m.classList.add('border-zinc-200');
+        });
+        this.classList.remove('border-zinc-200');
+        this.classList.add('border-black');
+      });
+    });
+  </script>
   <script defer src="proto-nav.js"></script>
 </body>
 </html>
