@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - Hweibo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen bg-white" data-proto-active="cart">
+  <!-- Sidebar -->
+  <a href="index.html" class="fixed left-4 sm:left-6 top-6 z-50 text-sm sm:text-base font-extrabold text-zinc-900 hover:text-black transition-colors">
+    HWEIBO
+  </a>
+
+  <div class="fixed left-4 sm:left-6 top-1/2 -translate-y-1/2 z-50">
+    <nav data-proto-nav="buyers" class="flex flex-col items-start">
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="search" href="search.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span>Search</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="browse" href="browse.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          <span>Browse</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="orders" href="orders.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>Orders</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="wallet" href="wallet.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+          <span>Wallet</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="cart" href="checkout.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          <span>Cart</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="profile" href="profile.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Header -->
+  <header class="border-b border-zinc-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between pl-24 sm:pl-32">
+      <a href="index.html" class="text-2xl font-extrabold font-sans text-black">HWEIBO</a>
+      <div class="flex items-center gap-2 text-sm text-zinc-500">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-700"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+        <span>Secure Checkout</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pl-24 sm:pl-32">
+    <div class="grid lg:grid-cols-3 gap-12">
+      <!-- Left: Cart Items -->
+      <div class="lg:col-span-2 space-y-8">
+        <div class="flex items-center justify-between">
+          <h1 id="cartTitle" class="text-2xl font-bold text-zinc-900">Shopping Cart (2 items)</h1>
+          <a id="continueShoppingLink" href="browse.html" class="text-sm font-semibold text-zinc-600 hover:text-zinc-900">Continue Shopping</a>
+        </div>
+
+        <!-- Cart Items -->
+        <div class="space-y-4">
+          <div id="primaryCartItem" class="flex gap-4 p-4 bg-zinc-50 rounded-2xl">
+            <div class="w-24 h-24 rounded-xl overflow-hidden bg-white">
+              <img id="primaryItemImage" src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop" alt="Product" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1">
+              <div class="flex items-start justify-between">
+                <div>
+                  <h3 id="primaryItemName" class="font-bold text-zinc-900">Luna Steel Watch</h3>
+                  <p id="primaryItemStore" class="text-sm text-zinc-500">Watch Hub</p>
+                  <p id="primaryItemLocation" class="text-sm text-zinc-400">Dar es Salaam</p>
+                </div>
+                <button class="p-2 text-zinc-400 hover:text-red-500 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                </button>
+              </div>
+              <div class="flex items-center justify-between mt-4">
+                <div class="flex items-center gap-3">
+                  <button onclick="updateQuantity('item1', -1)" class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+                  </button>
+                  <span id="qty-item1" class="font-semibold w-8 text-center">1</span>
+                  <button onclick="updateQuantity('item1', 1)" class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                  </button>
+                </div>
+                <span id="primaryItemPrice" class="font-bold text-lg">TZS 285k</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="secondaryCartItem" class="flex gap-4 p-4 bg-zinc-50 rounded-2xl">
+            <div class="w-24 h-24 rounded-xl overflow-hidden bg-white">
+              <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop" alt="Product" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1">
+              <div class="flex items-start justify-between">
+                <div>
+                  <h3 class="font-bold text-zinc-900">Studio Pro Wireless</h3>
+                  <p class="text-sm text-zinc-500">Audio Center</p>
+                  <p class="text-sm text-zinc-400">Mwanza</p>
+                </div>
+                <button class="p-2 text-zinc-400 hover:text-red-500 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                </button>
+              </div>
+              <div class="flex items-center justify-between mt-4">
+                <div class="flex items-center gap-3">
+                  <button onclick="updateQuantity('item2', -1)" class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+                  </button>
+                  <span id="qty-item2" class="font-semibold w-8 text-center">1</span>
+                  <button onclick="updateQuantity('item2', 1)" class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                  </button>
+                </div>
+                <span id="secondaryItemPrice" class="font-bold text-lg">TZS 420k</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Address -->
+        <div class="border-t border-zinc-200 pt-8">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-zinc-900">Delivery Address</h2>
+            <button class="px-4 py-2 rounded-full border border-zinc-200 text-sm font-semibold hover:bg-zinc-50">Change</button>
+          </div>
+          <div class="p-4 bg-zinc-50 rounded-2xl">
+            <div class="flex items-start gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 mt-0.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <div>
+                <p class="font-semibold text-zinc-900">Alexander Hamilton</p>
+                <p class="text-sm text-zinc-500">123 AI Innovation Lane<br>Manhattan, New York 10001</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Order Summary -->
+      <div class="lg:col-span-1">
+        <div class="bg-zinc-50 text-zinc-900 rounded-3xl p-8 sticky top-24 border border-zinc-200">
+          <h2 class="text-xl font-bold text-zinc-900 mb-6">Order Summary</h2>
+
+          <!-- Payment Method -->
+          <div class="mb-6">
+            <p class="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-3">Payment Method</p>
+            <div class="grid grid-cols-2 gap-3">
+              <button class="payment-method flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-black bg-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                <span class="text-xs font-semibold">Hweibo Wallet</span>
+              </button>
+              <button class="payment-method flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-zinc-200 bg-white hover:border-zinc-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                <span class="text-xs font-semibold">Credit Card</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Totals -->
+          <div class="space-y-3 mb-6">
+            <div class="flex justify-between text-sm">
+              <span class="text-zinc-500">Subtotal</span>
+              <span id="subtotalAmount" class="font-semibold text-zinc-900">TZS 705k</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-zinc-500">Shipping</span>
+              <span id="shippingAmount" class="font-semibold text-zinc-900">TZS 15k</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-zinc-500">Tax (18%)</span>
+              <span id="taxAmount" class="font-semibold text-zinc-900">TZS 127k</span>
+            </div>
+            <div class="border-t border-zinc-200 pt-3">
+              <div class="flex justify-between">
+                <span class="font-bold text-zinc-900">Grand Total</span>
+                <span id="grandTotalAmount" class="font-bold text-xl text-zinc-900">TZS 847k</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Checkout Button -->
+          <button id="checkoutBtn" onclick="processCheckout()" class="w-full h-14 rounded-full bg-black text-white font-bold text-lg hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2">
+            <span>Confirm Purchase</span>
+          </button>
+
+          <p class="text-center text-xs text-zinc-400 mt-4">Secured by Hweibo 256-bit encryption</p>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <script>
+    let primaryUnitPrice = 285000;
+    let secondaryUnitPrice = 420000;
+    let useSecondaryItem = true;
+    let activeQuery = "";
+    let activeSource = "browse";
+    let selectedCheckoutProduct = null;
+    let currentGrandTotal = 0;
+    let currentPrimaryLineTotal = 0;
+    let currentPrimaryQty = 1;
+
+    function formatTzs(value) {
+      const amount = Math.max(0, Math.round(Number(value) || 0));
+      if (amount >= 1000000) {
+        const compact = (amount / 1000000).toFixed(amount % 1000000 === 0 ? 0 : 1);
+        return `TZS ${compact.replace(/\.0$/, "")}M`;
+      }
+      if (amount >= 1000) {
+        const compact = (amount / 1000).toFixed(amount % 1000 === 0 ? 0 : 1);
+        return `TZS ${compact.replace(/\.0$/, "")}k`;
+      }
+      return `TZS ${amount}`;
+    }
+
+    function applySelectedProductFromQuery() {
+      const params = new URLSearchParams(window.location.search);
+      const selectedId = params.get("id") || "";
+      const selectedName = params.get("product") || params.get("name");
+      const selectedPrice = Number(params.get("price") || 0);
+      const selectedStore = params.get("store");
+      const selectedLocation = params.get("location");
+      const selectedImage = params.get("image");
+      activeQuery = params.get("q") || "";
+      activeSource = params.get("source") || "browse";
+
+      let storedProduct = null;
+      try {
+        const raw = sessionStorage.getItem("hweibo.selectedProduct");
+        if (raw) storedProduct = JSON.parse(raw);
+      } catch (_error) {
+        storedProduct = null;
+      }
+
+      const shouldUseStored = Boolean(
+        storedProduct &&
+        (
+          (selectedId && storedProduct.id === selectedId) ||
+          (!selectedName && storedProduct.name)
+        )
+      );
+
+      const selectedProduct = shouldUseStored
+        ? storedProduct
+        : selectedName
+          ? {
+              id: selectedId,
+              name: selectedName,
+              price: selectedPrice,
+              store: selectedStore || "",
+              location: selectedLocation || "",
+              image: selectedImage || ""
+            }
+          : null;
+
+      if (!selectedProduct || !selectedProduct.name) return;
+
+      useSecondaryItem = false;
+      primaryUnitPrice = Number(selectedProduct.price) > 0 ? Number(selectedProduct.price) : primaryUnitPrice;
+      selectedCheckoutProduct = {
+        id: selectedProduct.id || "",
+        name: selectedProduct.name,
+        price: primaryUnitPrice,
+        store: selectedProduct.store || "",
+        location: selectedProduct.location || "",
+        image: selectedProduct.image || ""
+      };
+      sessionStorage.setItem("hweibo.selectedProduct", JSON.stringify(selectedCheckoutProduct));
+
+      document.getElementById("primaryItemName").textContent = selectedCheckoutProduct.name;
+      if (selectedCheckoutProduct.store) document.getElementById("primaryItemStore").textContent = selectedCheckoutProduct.store;
+      if (selectedCheckoutProduct.location) document.getElementById("primaryItemLocation").textContent = selectedCheckoutProduct.location;
+      if (selectedCheckoutProduct.image) document.getElementById("primaryItemImage").src = selectedCheckoutProduct.image;
+      document.getElementById("primaryItemPrice").textContent = formatTzs(primaryUnitPrice);
+      document.getElementById("secondaryCartItem").style.display = "none";
+      document.getElementById("qty-item2").textContent = "0";
+      document.getElementById("cartTitle").textContent = "Shopping Cart (1 item)";
+      document.getElementById("continueShoppingLink").href = activeSource === "search"
+        ? (activeQuery ? `search.html?q=${encodeURIComponent(activeQuery)}` : "search.html")
+        : "browse.html";
+    }
+
+    function processCheckout() {
+      const btn = document.getElementById("checkoutBtn");
+      btn.disabled = true;
+      btn.innerHTML = `
+        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Processing...</span>
+      `;
+
+      setTimeout(() => {
+        btn.innerHTML = `
+          <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>Confirming...</span>
+        `;
+      }, 1500);
+
+      setTimeout(() => {
+        if (selectedCheckoutProduct) {
+          const next = new URLSearchParams({
+            id: selectedCheckoutProduct.id || "",
+            product: selectedCheckoutProduct.name,
+            name: selectedCheckoutProduct.name,
+            price: String(selectedCheckoutProduct.price),
+            qty: String(currentPrimaryQty),
+            line_total: String(currentPrimaryLineTotal),
+            total: String(currentGrandTotal),
+            store: selectedCheckoutProduct.store || "",
+            location: selectedCheckoutProduct.location || "",
+            image: selectedCheckoutProduct.image || "",
+            q: activeQuery || "",
+            source: activeSource || "browse"
+          });
+          window.location.href = `order-success.html?${next.toString()}`;
+          return;
+        }
+        window.location.href = activeQuery ? `order-success.html?q=${encodeURIComponent(activeQuery)}` : "order-success.html";
+      }, 2800);
+    }
+
+    function updateQuantity(item, change) {
+      if (!useSecondaryItem && item === "item2") return;
+
+      const qtyElement = document.getElementById("qty-" + item);
+      let currentQty = parseInt(qtyElement.textContent, 10) || 1;
+      currentQty += change;
+      if (currentQty < 1) currentQty = 1;
+      if (currentQty > 10) currentQty = 10;
+      qtyElement.textContent = currentQty;
+      updateTotals();
+    }
+
+    function updateTotals() {
+      const qty1 = parseInt(document.getElementById("qty-item1").textContent, 10) || 1;
+      const qty2 = useSecondaryItem ? (parseInt(document.getElementById("qty-item2").textContent, 10) || 1) : 0;
+      const subtotal = (qty1 * primaryUnitPrice) + (qty2 * secondaryUnitPrice);
+      const shipping = subtotal > 0 ? 15000 : 0;
+      const tax = Math.round(subtotal * 0.18);
+      const total = subtotal + shipping + tax;
+      currentPrimaryQty = qty1;
+      currentPrimaryLineTotal = qty1 * primaryUnitPrice;
+      currentGrandTotal = total;
+
+      document.getElementById("primaryItemPrice").textContent = formatTzs(primaryUnitPrice * qty1);
+      document.getElementById("secondaryItemPrice").textContent = formatTzs(secondaryUnitPrice * qty2);
+      document.getElementById("subtotalAmount").textContent = formatTzs(subtotal);
+      document.getElementById("shippingAmount").textContent = formatTzs(shipping);
+      document.getElementById("taxAmount").textContent = formatTzs(tax);
+      document.getElementById("grandTotalAmount").textContent = formatTzs(total);
+    }
+
+    document.querySelectorAll(".payment-method").forEach((method) => {
+      method.addEventListener("click", function () {
+        document.querySelectorAll(".payment-method").forEach((m) => {
+          m.classList.remove("border-black");
+          m.classList.add("border-zinc-200");
+        });
+        this.classList.remove("border-zinc-200");
+        this.classList.add("border-black");
+      });
+    });
+
+    applySelectedProductFromQuery();
+    updateTotals();
+  </script>
+  <script defer src="../proto-nav.js"></script>
+</body>
+</html>

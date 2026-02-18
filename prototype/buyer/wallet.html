@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wallet - Hweibo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen bg-white" data-proto-active="wallet">
+  <a href="index.html" class="fixed left-4 sm:left-6 top-6 z-50 text-sm sm:text-base font-extrabold text-zinc-900 hover:text-black transition-colors">
+    HWEIBO
+  </a>
+
+  <div class="fixed left-4 sm:left-6 top-1/2 -translate-y-1/2 z-50">
+    <nav data-proto-nav="buyers" class="flex flex-col items-start">
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="search" href="search.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span>Search</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="browse" href="browse.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          <span>Browse</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="orders" href="orders.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>Orders</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="wallet" href="wallet.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+          <span>Wallet</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="cart" href="checkout.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          <span>Cart</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="profile" href="profile.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pl-24 sm:pl-32">
+    <h1 class="text-3xl font-extrabold text-zinc-900 mb-2">Wallet</h1>
+    <p class="text-zinc-500 mb-8">Manage your balance and top up</p>
+
+    <div class="rounded-3xl border border-zinc-200 bg-zinc-50 p-8 mb-8">
+      <p class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Available Balance</p>
+      <p id="walletBalanceValue" class="text-5xl font-extrabold text-zinc-900 mt-2">TZS 2.5M</p>
+
+      <div class="mt-6 flex flex-wrap gap-3">
+        <button id="topUpWalletBtn" class="px-6 py-3 bg-black text-white font-semibold rounded-full hover:bg-zinc-800 transition-colors">
+          Top Up Wallet
+        </button>
+        <button id="resetWalletBtn" class="px-6 py-3 border border-zinc-200 bg-white text-zinc-700 font-semibold rounded-full hover:border-zinc-400 transition-colors">
+          Reset Demo
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="text-xl font-bold text-zinc-900 mb-4">Recent Activity</h2>
+      <div id="activityList" class="space-y-3"></div>
+    </div>
+  </div>
+
+  <div id="topUpModal" class="hidden fixed inset-0 z-[80] bg-black/40 p-4 sm:p-8">
+    <div class="max-w-md w-full mx-auto mt-16 rounded-3xl bg-white border border-zinc-200 overflow-hidden">
+      <div class="px-5 py-4 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
+        <p class="font-semibold text-zinc-900">Top Up Wallet</p>
+        <button id="closeTopUpModalBtn" class="text-sm text-zinc-600 hover:text-black">Close</button>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <div>
+          <label for="topUpAmountInput" class="block text-sm font-medium text-zinc-700 mb-2">Amount (TZS)</label>
+          <input id="topUpAmountInput" type="number" min="1000" step="1000" placeholder="100000" class="w-full px-4 py-3 rounded-2xl border border-zinc-200 focus:outline-none focus:border-black">
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button data-topup-preset="100000" class="topup-preset px-3 py-2 rounded-full border border-zinc-200 text-sm text-zinc-700 hover:border-zinc-400">100k</button>
+          <button data-topup-preset="250000" class="topup-preset px-3 py-2 rounded-full border border-zinc-200 text-sm text-zinc-700 hover:border-zinc-400">250k</button>
+          <button data-topup-preset="500000" class="topup-preset px-3 py-2 rounded-full border border-zinc-200 text-sm text-zinc-700 hover:border-zinc-400">500k</button>
+          <button data-topup-preset="1000000" class="topup-preset px-3 py-2 rounded-full border border-zinc-200 text-sm text-zinc-700 hover:border-zinc-400">1M</button>
+        </div>
+
+        <div>
+          <p class="block text-sm font-medium text-zinc-700 mb-2">Payment method</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="railMobileMoneyBtn" type="button" data-rail="mobile_money" class="payment-rail px-3 py-2 rounded-full border border-zinc-200 text-sm text-zinc-700 hover:border-zinc-400">
+              Mobile money
+            </button>
+            <button id="railBankBtn" type="button" data-rail="bank_transfer" class="payment-rail px-3 py-2 rounded-full border border-zinc-200 text-sm text-zinc-700 hover:border-zinc-400">
+              Bank transfer
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label for="topUpProviderSelect" class="block text-sm font-medium text-zinc-700 mb-2">Provider</label>
+          <select id="topUpProviderSelect" class="w-full px-4 py-3 rounded-2xl border border-zinc-200 focus:outline-none focus:border-black bg-white"></select>
+        </div>
+
+        <div>
+          <label id="topUpSourceLabel" for="topUpSourceInput" class="block text-sm font-medium text-zinc-700 mb-2">Mobile number</label>
+          <input id="topUpSourceInput" type="text" placeholder="07XXXXXXXX" class="w-full px-4 py-3 rounded-2xl border border-zinc-200 focus:outline-none focus:border-black">
+        </div>
+
+        <p id="topUpError" class="hidden text-sm text-red-600"></p>
+
+        <button id="confirmTopUpBtn" class="w-full px-5 py-3 rounded-full bg-black text-white font-semibold hover:bg-zinc-800 transition-colors">
+          Add Money
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BALANCE_KEY = "hweibo.wallet.balance";
+    const ACTIVITY_KEY = "hweibo.wallet.activity";
+    const DEFAULT_BALANCE = 2500000;
+    const DEFAULT_ACTIVITY = [
+      { id: "A-100", type: "credit", title: "Wallet Top Up", subtitle: "Added to your balance", amount: 1000000 },
+      { id: "A-101", type: "debit", title: "Purchase", subtitle: "Order #12345", amount: 450000 },
+      { id: "A-102", type: "credit", title: "Wallet Top Up", subtitle: "Added to your balance", amount: 500000 }
+    ];
+
+    const walletBalanceValue = document.getElementById("walletBalanceValue");
+    const activityList = document.getElementById("activityList");
+    const topUpModal = document.getElementById("topUpModal");
+    const topUpAmountInput = document.getElementById("topUpAmountInput");
+    const topUpProviderSelect = document.getElementById("topUpProviderSelect");
+    const topUpSourceInput = document.getElementById("topUpSourceInput");
+    const topUpSourceLabel = document.getElementById("topUpSourceLabel");
+    const topUpError = document.getElementById("topUpError");
+    const railButtons = Array.from(document.querySelectorAll(".payment-rail"));
+
+    const PAYMENT_RAILS = {
+      mobile_money: [
+        { id: "mpesa", label: "M-Pesa" },
+        { id: "tigopesa", label: "Tigo Pesa" },
+        { id: "airtelmoney", label: "Airtel Money" },
+        { id: "halopesa", label: "HaloPesa" }
+      ],
+      bank_transfer: [
+        { id: "crdb", label: "CRDB Bank" },
+        { id: "nmb", label: "NMB Bank" },
+        { id: "nbc", label: "NBC Bank" },
+        { id: "absa", label: "Absa Bank" }
+      ]
+    };
+
+    let activeRail = "mobile_money";
+
+    function formatTzs(value) {
+      const amount = Math.max(0, Math.round(Number(value) || 0));
+      if (amount >= 1000000) {
+        const compact = (amount / 1000000).toFixed(amount % 1000000 === 0 ? 0 : 1);
+        return `TZS ${compact.replace(/\.0$/, "")}M`;
+      }
+      if (amount >= 1000) {
+        const compact = (amount / 1000).toFixed(amount % 1000 === 0 ? 0 : 1);
+        return `TZS ${compact.replace(/\.0$/, "")}k`;
+      }
+      return `TZS ${amount}`;
+    }
+
+    function readBalance() {
+      const raw = localStorage.getItem(BALANCE_KEY);
+      const parsed = Number(raw);
+      return Number.isFinite(parsed) && parsed >= 0 ? parsed : DEFAULT_BALANCE;
+    }
+
+    function writeBalance(value) {
+      localStorage.setItem(BALANCE_KEY, String(Math.max(0, Math.round(Number(value) || 0))));
+    }
+
+    function readActivity() {
+      const raw = localStorage.getItem(ACTIVITY_KEY);
+      if (!raw) return DEFAULT_ACTIVITY.slice();
+      try {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : DEFAULT_ACTIVITY.slice();
+      } catch (_error) {
+        return DEFAULT_ACTIVITY.slice();
+      }
+    }
+
+    function writeActivity(activity) {
+      localStorage.setItem(ACTIVITY_KEY, JSON.stringify(activity));
+    }
+
+    function activityIcon(type) {
+      if (type === "credit") {
+        return `
+          <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+        `;
+      }
+      return `
+        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-600"><path d="M5 12h14"/></svg>
+        </div>
+      `;
+    }
+
+    function renderWallet() {
+      const balance = readBalance();
+      const activity = readActivity();
+
+      walletBalanceValue.textContent = formatTzs(balance);
+      activityList.innerHTML = activity.map((entry) => {
+        const isCredit = entry.type === "credit";
+        return `
+          <div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
+            <div class="flex items-center gap-4">
+              ${activityIcon(entry.type)}
+              <div>
+                <p class="font-semibold text-zinc-900">${entry.title}</p>
+                <p class="text-sm text-zinc-500">${entry.subtitle}</p>
+              </div>
+            </div>
+            <span class="${isCredit ? "text-green-600" : "text-red-500"} font-bold">${isCredit ? "+" : "-"}${formatTzs(entry.amount)}</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function setActiveRail(rail) {
+      activeRail = rail in PAYMENT_RAILS ? rail : "mobile_money";
+      const providers = PAYMENT_RAILS[activeRail];
+
+      railButtons.forEach((button) => {
+        const isActive = button.getAttribute("data-rail") === activeRail;
+        button.classList.toggle("bg-black", isActive);
+        button.classList.toggle("text-white", isActive);
+        button.classList.toggle("border-black", isActive);
+        button.classList.toggle("text-zinc-700", !isActive);
+        button.classList.toggle("border-zinc-200", !isActive);
+      });
+
+      topUpProviderSelect.innerHTML = providers.map((provider) => `
+        <option value="${provider.id}">${provider.label}</option>
+      `).join("");
+
+      if (activeRail === "mobile_money") {
+        topUpSourceLabel.textContent = "Mobile number";
+        topUpSourceInput.placeholder = "07XXXXXXXX";
+      } else {
+        topUpSourceLabel.textContent = "Account number";
+        topUpSourceInput.placeholder = "Enter account number";
+      }
+    }
+
+    function findProviderLabel(rail, providerId) {
+      const providers = PAYMENT_RAILS[rail] || [];
+      const found = providers.find((provider) => provider.id === providerId);
+      return found ? found.label : "";
+    }
+
+    function closeTopUpModal() {
+      topUpModal.classList.add("hidden");
+      topUpError.classList.add("hidden");
+      topUpError.textContent = "";
+      topUpAmountInput.value = "";
+      topUpSourceInput.value = "";
+    }
+
+    document.getElementById("topUpWalletBtn").addEventListener("click", () => {
+      topUpModal.classList.remove("hidden");
+      topUpAmountInput.focus();
+    });
+
+    document.getElementById("closeTopUpModalBtn").addEventListener("click", closeTopUpModal);
+    topUpModal.addEventListener("click", (event) => {
+      if (event.target === topUpModal) closeTopUpModal();
+    });
+
+    document.querySelectorAll(".topup-preset").forEach((button) => {
+      button.addEventListener("click", () => {
+        const value = Number(button.getAttribute("data-topup-preset") || 0);
+        topUpAmountInput.value = value > 0 ? String(value) : "";
+        topUpError.classList.add("hidden");
+      });
+    });
+
+    railButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const rail = button.getAttribute("data-rail") || "mobile_money";
+        setActiveRail(rail);
+        topUpError.classList.add("hidden");
+      });
+    });
+
+    document.getElementById("confirmTopUpBtn").addEventListener("click", () => {
+      const amount = Math.round(Number(topUpAmountInput.value || 0));
+      const providerId = topUpProviderSelect.value || "";
+      const source = (topUpSourceInput.value || "").trim();
+
+      if (!Number.isFinite(amount) || amount < 1000) {
+        topUpError.textContent = "Enter a valid amount (minimum TZS 1k).";
+        topUpError.classList.remove("hidden");
+        return;
+      }
+      if (!providerId || !findProviderLabel(activeRail, providerId)) {
+        topUpError.textContent = "Select a valid payment provider.";
+        topUpError.classList.remove("hidden");
+        return;
+      }
+      if (source.length < 6) {
+        topUpError.textContent = activeRail === "mobile_money"
+          ? "Enter a valid mobile number."
+          : "Enter a valid account number.";
+        topUpError.classList.remove("hidden");
+        return;
+      }
+
+      const balance = readBalance() + amount;
+      writeBalance(balance);
+
+      const providerLabel = findProviderLabel(activeRail, providerId);
+      const maskedSource = source.length > 4
+        ? `${"*".repeat(Math.max(0, source.length - 4))}${source.slice(-4)}`
+        : source;
+
+      const activity = readActivity();
+      activity.unshift({
+        id: `A-${Date.now()}`,
+        type: "credit",
+        title: "Wallet Top Up",
+        subtitle: `${providerLabel} • ${maskedSource}`,
+        amount
+      });
+      writeActivity(activity.slice(0, 12));
+
+      renderWallet();
+      closeTopUpModal();
+    });
+
+    document.getElementById("resetWalletBtn").addEventListener("click", () => {
+      writeBalance(DEFAULT_BALANCE);
+      writeActivity(DEFAULT_ACTIVITY.slice());
+      renderWallet();
+    });
+
+    setActiveRail("mobile_money");
+    renderWallet();
+  </script>
+  <script defer src="../proto-nav.js"></script>
+</body>
+</html>

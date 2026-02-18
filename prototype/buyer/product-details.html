@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details - Hweibo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen bg-white" data-proto-active="browse">
+  <a href="index.html" class="fixed left-4 sm:left-6 top-6 z-50 text-sm sm:text-base font-extrabold text-zinc-900 hover:text-black transition-colors">
+    HWEIBO
+  </a>
+
+  <div class="fixed left-4 sm:left-6 top-1/2 -translate-y-1/2 z-50">
+    <nav data-proto-nav="buyers" class="flex flex-col items-start">
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="search" href="search.html"><span>Search</span></a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="browse" href="browse.html"><span>Browse</span></a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="orders" href="orders.html"><span>Orders</span></a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="wallet" href="wallet.html"><span>Wallet</span></a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="cart" href="checkout.html"><span>Cart</span></a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="profile" href="profile.html"><span>Profile</span></a>
+      </div>
+    </nav>
+  </div>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pl-24 sm:pl-32">
+    <div class="flex items-center justify-between mb-6">
+      <a id="backLink" href="browse.html" class="text-sm font-medium text-zinc-600 hover:text-black">← Back to products</a>
+      <a id="buyNowLinkTop" href="checkout.html" class="px-5 py-2.5 rounded-full bg-black text-white text-sm font-medium hover:bg-zinc-800">Buy now</a>
+    </div>
+
+    <div class="grid gap-8 lg:grid-cols-2">
+      <div class="rounded-3xl border border-zinc-200 bg-zinc-50 p-3">
+        <img id="productImage" src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=900&fit=crop" alt="Product" class="w-full h-[420px] object-contain bg-white rounded-2xl p-2">
+      </div>
+
+      <div>
+        <p class="text-xs uppercase tracking-[0.16em] text-zinc-500">Product details</p>
+        <h1 id="productName" class="mt-2 text-3xl font-semibold text-zinc-900">Luna Steel Watch</h1>
+        <p id="productPrice" class="mt-2 text-2xl font-semibold text-zinc-900">TZS 285k</p>
+        <div class="mt-3">
+          <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_dWQXXf.json" background="transparent" speed="1" style="width: 72px; height: 72px" loop autoplay></lottie-player>
+        </div>
+
+        <div class="mt-6 space-y-3 text-sm text-zinc-600">
+          <p><span class="font-medium text-zinc-800">Store:</span> <span id="productStore">Watch Hub</span></p>
+          <p><span class="font-medium text-zinc-800">Location:</span> <span id="productLocation">Dar es Salaam</span></p>
+          <p>Delivery simulation includes live route view and tracking in Orders.</p>
+        </div>
+
+        <div class="mt-6 rounded-2xl border border-zinc-200 overflow-hidden">
+          <div class="px-4 py-3 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
+            <p class="text-sm font-medium text-zinc-700">Store location map</p>
+            <button id="expandMapBtn" class="text-sm text-zinc-600 hover:text-black">Expand map</button>
+          </div>
+          <div class="relative h-64">
+            <iframe id="locationMap" class="absolute inset-0 w-full h-full" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Nyerere+Square+Dodoma&output=embed"></iframe>
+          </div>
+        </div>
+
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a id="buyNowLink" href="checkout.html" class="px-6 py-3 rounded-full bg-black text-white font-medium hover:bg-zinc-800">Proceed to checkout</a>
+          <a id="backLinkBottom" href="browse.html" class="px-6 py-3 rounded-full border border-zinc-200 text-zinc-700 font-medium hover:border-zinc-400">Back</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="mapModal" class="hidden fixed inset-0 z-[70] bg-black/50 p-4 sm:p-8">
+    <div class="bg-white w-full h-full rounded-2xl overflow-hidden border border-zinc-200">
+      <div class="h-14 px-4 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
+        <p class="font-medium text-zinc-800">Expanded location map</p>
+        <button id="closeMapModal" class="px-3 py-1.5 rounded-lg border border-zinc-200 text-sm text-zinc-600 hover:text-black">Close</button>
+      </div>
+      <iframe id="locationMapExpanded" class="w-full h-[calc(100%-56px)]" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Nyerere+Square+Dodoma&output=embed"></iframe>
+    </div>
+  </div>
+
+  <script>
+    function formatTzs(value) {
+      const amount = Math.max(0, Math.round(Number(value) || 0));
+      if (amount >= 1000000) {
+        const compact = (amount / 1000000).toFixed(amount % 1000000 === 0 ? 0 : 1);
+        return `TZS ${compact.replace(/\.0$/, "")}M`;
+      }
+      if (amount >= 1000) {
+        const compact = (amount / 1000).toFixed(amount % 1000 === 0 ? 0 : 1);
+        return `TZS ${compact.replace(/\.0$/, "")}k`;
+      }
+      return `TZS ${amount}`;
+    }
+
+    const FALLBACK_PRODUCT = {
+      id: "watch-luna",
+      name: "Luna Steel Watch",
+      price: 285000,
+      store: "Watch Hub",
+      location: "Dar es Salaam",
+      image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=900&fit=crop"
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const source = params.get("source") || "browse";
+    const q = params.get("q") || "";
+    const selectedId = params.get("id") || "";
+
+    let storedProduct = null;
+    try {
+      const raw = sessionStorage.getItem("hweibo.selectedProduct");
+      if (raw) storedProduct = JSON.parse(raw);
+    } catch (_error) {
+      storedProduct = null;
+    }
+
+    const fromParams = {
+      id: selectedId,
+      name: params.get("name") || params.get("product") || "",
+      price: Number(params.get("price") || 0),
+      store: params.get("store") || "",
+      location: params.get("location") || "",
+      image: params.get("image") || ""
+    };
+
+    const shouldUseStored = Boolean(
+      storedProduct &&
+      (
+        (selectedId && storedProduct.id === selectedId) ||
+        (!selectedId && !fromParams.name && storedProduct.name)
+      )
+    );
+
+    const selected = shouldUseStored
+      ? storedProduct
+      : {
+          ...FALLBACK_PRODUCT,
+          ...fromParams,
+          name: fromParams.name || FALLBACK_PRODUCT.name,
+          price: fromParams.price > 0 ? fromParams.price : FALLBACK_PRODUCT.price,
+          store: fromParams.store || FALLBACK_PRODUCT.store,
+          location: fromParams.location || FALLBACK_PRODUCT.location,
+          image: fromParams.image || FALLBACK_PRODUCT.image
+        };
+
+    sessionStorage.setItem("hweibo.selectedProduct", JSON.stringify(selected));
+
+    document.getElementById("productName").textContent = selected.name;
+    document.getElementById("productPrice").textContent = formatTzs(selected.price);
+    document.getElementById("productStore").textContent = selected.store;
+    document.getElementById("productLocation").textContent = selected.location;
+    document.getElementById("productImage").src = selected.image;
+
+    const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(selected.location + ", Tanzania")}&output=embed`;
+    document.getElementById("locationMap").src = mapSrc;
+    document.getElementById("locationMapExpanded").src = mapSrc;
+
+    const backHref = source === "search"
+      ? `search.html${q ? `?q=${encodeURIComponent(q)}` : ""}`
+      : "browse.html";
+
+    document.getElementById("backLink").href = backHref;
+    document.getElementById("backLinkBottom").href = backHref;
+
+    const checkoutHref = `checkout.html?${new URLSearchParams({
+      id: selected.id || "",
+      name: selected.name,
+      product: selected.name,
+      price: String(selected.price),
+      store: selected.store,
+      location: selected.location,
+      image: selected.image,
+      q,
+      source
+    }).toString()}`;
+    document.getElementById("buyNowLink").href = checkoutHref;
+    document.getElementById("buyNowLinkTop").href = checkoutHref;
+
+    const mapModal = document.getElementById("mapModal");
+    document.getElementById("expandMapBtn").addEventListener("click", () => mapModal.classList.remove("hidden"));
+    document.getElementById("closeMapModal").addEventListener("click", () => mapModal.classList.add("hidden"));
+  </script>
+  <script defer src="../proto-nav.js"></script>
+</body>
+</html>

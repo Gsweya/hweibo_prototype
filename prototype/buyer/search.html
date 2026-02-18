@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search - Hweibo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen bg-white" data-proto-active="search">
+  <a href="index.html" class="fixed left-4 sm:left-6 top-6 z-50 text-sm sm:text-base font-extrabold text-zinc-900 hover:text-black transition-colors">
+    HWEIBO
+  </a>
+
+  <div class="fixed left-4 sm:left-6 top-1/2 -translate-y-1/2 z-50">
+    <nav data-proto-nav="buyers" class="flex flex-col items-start">
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="search" href="search.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span>Search</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="browse" href="browse.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          <span>Browse</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="orders" href="orders.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>Orders</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="wallet" href="wallet.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+          <span>Wallet</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="cart" href="checkout.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          <span>Cart</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="profile" href="profile.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="min-h-screen flex flex-col">
+    <main class="flex-1 overflow-y-auto">
+      <div class="max-w-[940px] mx-auto px-4 py-8 pl-24 sm:pl-32">
+        <div class="space-y-6">
+          <div class="flex flex-col items-end">
+            <span class="text-xs font-medium uppercase tracking-wider text-zinc-500 mb-2 px-2">You</span>
+            <div class="max-w-[88%] px-6 py-4 bg-white border border-zinc-200 rounded-[20px] rounded-tr-[10px]">
+              <p id="userQueryText" class="text-base text-zinc-900">I am looking for a pc under 2M TZS</p>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-start">
+            <span class="text-xs font-medium uppercase tracking-wider text-zinc-500 mb-2 px-2">Hweibo AI</span>
+            <div class="max-w-[92%] px-5 py-4 bg-zinc-50 rounded-[20px] rounded-tl-[10px] border border-zinc-200">
+              <div class="flex items-center gap-3">
+                <lottie-player src="https://assets9.lottiefiles.com/packages/lf20_fcfjwiyb.json" background="transparent" speed="1" style="width: 36px; height: 36px" loop autoplay></lottie-player>
+                <p id="aiMessageText" class="text-base text-zinc-900">Finding the best product matches for your request...</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2 px-1" id="samplePromptRow"></div>
+
+          <div class="mt-4 w-full">
+            <div class="flex items-center gap-2 mb-4 text-sm text-zinc-500 px-1">
+              <span id="foundCountText">Found matching products</span>
+            </div>
+            <div id="resultsList" class="space-y-3"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="bg-white border-t border-black/10 p-4">
+      <div class="max-w-[920px] mx-auto">
+        <div class="flex items-center bg-white rounded-full border border-black/10 px-4 py-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-black/40"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="searchInput" type="text" placeholder="Describe what you're looking for..." class="flex-1 ml-4 py-3 text-base text-black placeholder:text-black/30 focus:outline-none bg-transparent">
+          <button id="searchBtn" class="w-10 h-10 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors" aria-label="Search">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const SAMPLE_PROMPTS = [
+      "I am looking for a pc under 2M TZS",
+      "Running shoes under 500k TZS",
+      "Smartphone with good camera"
+    ];
+
+    const CATALOG = [
+      { id: "lap-ideapad", name: "Lenovo IdeaPad 5", category: "laptop", price: 1850000, store: "Hweibo Tech", location: "Dodoma", image: "../assets/product_images/laptops/lenovo-idea-pad.avif", tags: ["pc", "laptop", "computer", "office", "battery", "student"], blurb: "Balanced performance for study and work.", rating: 4.5 },
+      { id: "lap-zenbook", name: "Asus Zenbook 14", category: "laptop", price: 1940000, store: "Laptop City", location: "Dar es Salaam", image: "../assets/product_images/laptops/asus-zenbook.jpg", tags: ["pc", "laptop", "ultrabook", "computer", "portable"], blurb: "Slim premium laptop with strong battery life.", rating: 4.6 },
+      { id: "lap-xps17", name: "Dell XPS 17", category: "laptop", price: 3980000, store: "Premium Tech", location: "Mwanza", image: "../assets/product_images/laptops/xps-17.avif", tags: ["pc", "laptop", "computer", "creative", "display"], blurb: "High-end display and power for heavy workloads.", rating: 4.8 },
+      { id: "lap-legion", name: "Lenovo Legion Pro", category: "laptop", price: 2760000, store: "GameCore", location: "Arusha", image: "../assets/product_images/laptops/lenovo-legion-pro.webp", tags: ["pc", "laptop", "gaming", "computer", "performance"], blurb: "Gaming-ready laptop with dedicated GPU.", rating: 4.7 },
+
+      { id: "shoe-airmax", name: "Nike Air Max Plus", category: "shoes", price: 385000, store: "Sport World", location: "Dodoma", image: "../assets/product_images/shoes/Nike-Air-Max-Plus.webp", tags: ["running", "shoe", "shoes", "nike", "sneaker"], blurb: "Responsive cushioning for road and gym runs.", rating: 4.5 },
+      { id: "shoe-puma", name: "Puma Sport Runner", category: "shoes", price: 268000, store: "Athletic Hub", location: "Dar es Salaam", image: "../assets/product_images/shoes/puma-sport.jpg", tags: ["running", "shoe", "shoes", "puma", "sneaker"], blurb: "Lightweight daily runner with breathable upper.", rating: 4.4 },
+      { id: "shoe-galaxy", name: "Adidas Galaxy 5", category: "shoes", price: 219000, store: "Move Store", location: "Arusha", image: "../assets/product_images/shoes/galaxy-5-trainers-with-laces.jpg", tags: ["running", "shoe", "shoes", "adidas", "budget"], blurb: "Affordable trainer for everyday cardio sessions.", rating: 4.3 },
+      { id: "shoe-balance", name: "New Balance Wake Up", category: "shoes", price: 449000, store: "Runner's Lab", location: "Mwanza", image: "../assets/product_images/shoes/new-balance-wake-up.webp", tags: ["running", "shoe", "shoes", "new balance", "comfort"], blurb: "Soft foam support for longer distances.", rating: 4.6 },
+
+      { id: "phone-iphone14", name: "iPhone 14 Pro", category: "phone", price: 2950000, cameraRank: 10, store: "Mobile One", location: "Dodoma", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=900&h=900&fit=crop", tags: ["smartphone", "phone", "camera", "iphone", "ios"], blurb: "Excellent camera system and pro-level video.", rating: 4.8 },
+      { id: "phone-s23", name: "Samsung Galaxy S23", category: "phone", price: 2140000, cameraRank: 9, store: "Tech Point", location: "Dar es Salaam", image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=900&h=900&fit=crop", tags: ["smartphone", "phone", "camera", "android", "samsung"], blurb: "Sharp day and night photos with reliable autofocus.", rating: 4.7 },
+      { id: "phone-pixel8", name: "Google Pixel 8", category: "phone", price: 1860000, cameraRank: 10, store: "Camera Phones TZ", location: "Arusha", image: "https://images.unsplash.com/photo-1693968194657-08958d23afcf?w=900&h=900&fit=crop", tags: ["smartphone", "phone", "camera", "pixel", "android"], blurb: "Top portrait and computational photography quality.", rating: 4.8 },
+      { id: "phone-redmi13", name: "Xiaomi Redmi Note 13 Pro", category: "phone", price: 875000, cameraRank: 7, store: "Budget Tech", location: "Mwanza", image: "https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=900&h=900&fit=crop", tags: ["smartphone", "phone", "camera", "xiaomi", "budget"], blurb: "Strong camera value in the mid-range segment.", rating: 4.4 }
+    ];
+
+    const params = new URLSearchParams(window.location.search);
+    const initialQuery = (params.get("q") || SAMPLE_PROMPTS[0]).trim();
+
+    const searchInput = document.getElementById("searchInput");
+    const userQueryText = document.getElementById("userQueryText");
+    const aiMessageText = document.getElementById("aiMessageText");
+    const foundCountText = document.getElementById("foundCountText");
+    const resultsList = document.getElementById("resultsList");
+    const samplePromptRow = document.getElementById("samplePromptRow");
+
+    function formatPrice(value) {
+      const amount = Math.max(0, Math.round(Number(value) || 0));
+      if (amount >= 1000000) {
+        const compact = (amount / 1000000).toFixed(amount % 1000000 === 0 ? 0 : 1);
+        return `TZS ${compact.replace(/\.0$/, "")}M`;
+      }
+      if (amount >= 1000) {
+        const compact = (amount / 1000).toFixed(amount % 1000 === 0 ? 0 : 1);
+        return `TZS ${compact.replace(/\.0$/, "")}k`;
+      }
+      return `TZS ${amount}`;
+    }
+
+    function parseBudget(queryText) {
+      const text = queryText.toLowerCase();
+      const budgetMatch = text.match(/(?:under|below|less than|up to|max(?:imum)?|not more than)\s*(?:tzs\s*)?([0-9][0-9,]*(?:\.[0-9]+)?)\s*(m|k|million|thousand)?/i);
+      if (!budgetMatch) return null;
+
+      const amount = Number((budgetMatch[1] || "").replace(/,/g, ""));
+      const suffix = (budgetMatch[2] || "").toLowerCase();
+      if (!Number.isFinite(amount)) return null;
+      if (suffix === "m" || suffix === "million") return amount * 1000000;
+      if (suffix === "k" || suffix === "thousand") return amount * 1000;
+      return amount;
+    }
+
+    function detectCategory(queryText) {
+      const text = queryText.toLowerCase();
+      if (/(pc|laptop|computer|macbook|notebook)/.test(text)) return "laptop";
+      if (/(running|shoe|shoes|sneaker|trainer)/.test(text)) return "shoes";
+      if (/(smartphone|phone|camera|iphone|android|pixel|samsung|xiaomi)/.test(text)) return "phone";
+      return null;
+    }
+
+    function tokenize(queryText) {
+      return queryText
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, " ")
+        .split(/\s+/)
+        .filter((token) => token && token.length > 1);
+    }
+
+    function searchProducts(rawQuery) {
+      const queryText = (rawQuery || "").trim();
+      const normalized = queryText.toLowerCase();
+      const budget = parseBudget(normalized);
+      const category = detectCategory(normalized);
+      const tokens = tokenize(normalized);
+
+      const wantsCamera = /(camera|photo|portrait|video)/.test(normalized);
+      const wantsRunning = /(running|jog|cardio|gym)/.test(normalized);
+      const wantsGaming = /(gaming|gpu|fps|performance)/.test(normalized);
+
+      let pool = category ? CATALOG.filter((item) => item.category === category) : CATALOG.slice();
+
+      if (budget) {
+        const withinBudget = pool.filter((item) => item.price <= budget);
+        if (withinBudget.length) pool = withinBudget;
+      }
+
+      const ranked = pool
+        .map((item) => {
+          const haystack = `${item.name} ${item.tags.join(" ")} ${item.blurb}`.toLowerCase();
+          let score = 0;
+
+          tokens.forEach((token) => {
+            if (item.name.toLowerCase().includes(token)) score += 4;
+            else if (haystack.includes(token)) score += 2;
+          });
+
+          if (category && item.category === category) score += 8;
+          if (budget && item.price <= budget) score += 4;
+
+          if (wantsCamera && item.category === "phone") score += 6 + (item.cameraRank || 0);
+          if (wantsRunning && item.category === "shoes") score += 7;
+          if (wantsGaming && item.tags.includes("gaming")) score += 6;
+
+          score += item.rating || 0;
+          return { item, score };
+        })
+        .sort((a, b) => (b.score - a.score) || (a.item.price - b.item.price));
+
+      const topMatches = ranked.slice(0, 6).map((entry) => entry.item);
+      return { matches: topMatches, category, budget };
+    }
+
+    function buildDetailsPanel(product, queryText) {
+      const checkoutParams = new URLSearchParams({
+        id: product.id || "",
+        product: product.name,
+        name: product.name,
+        price: String(product.price),
+        store: product.store,
+        location: product.location,
+        image: product.image,
+        q: queryText,
+        source: "search"
+      });
+
+      return `
+        <div class="hidden mt-3 rounded-2xl border border-zinc-200 bg-white p-4" data-role="details">
+          <div class="flex items-center gap-2 mb-3">
+            <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_dWQXXf.json" background="transparent" speed="1" style="width: 28px; height: 28px" loop autoplay></lottie-player>
+            <p class="text-sm text-zinc-700">Details in chat: store, location and direct checkout flow.</p>
+          </div>
+          <div class="grid gap-3 sm:grid-cols-2 text-sm text-zinc-600">
+            <p><span class="text-zinc-900 font-medium">Store:</span> ${product.store}</p>
+            <p><span class="text-zinc-900 font-medium">Location:</span> ${product.location}</p>
+          </div>
+          <div class="mt-3 h-40 rounded-xl overflow-hidden border border-zinc-200 bg-zinc-50">
+            <iframe class="w-full h-full" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=${encodeURIComponent(product.location + ', Tanzania')}&output=embed"></iframe>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <a href="checkout.html?${checkoutParams.toString()}" data-action="go-checkout" class="inline-flex items-center justify-center px-4 py-2 rounded-full bg-black text-white text-sm font-medium hover:bg-zinc-800 transition-colors">Proceed to checkout</a>
+            <a href="product-details.html?${checkoutParams.toString()}" data-action="go-details" class="inline-flex items-center justify-center px-4 py-2 rounded-full border border-zinc-300 text-zinc-700 text-sm font-medium hover:border-zinc-400 transition-colors">Open full details page</a>
+          </div>
+        </div>
+      `;
+    }
+
+    function buildCard(product, queryText) {
+      const card = document.createElement("div");
+      card.className = "bg-zinc-50 border border-zinc-200 rounded-3xl p-4";
+      card.innerHTML = `
+        <div class="flex items-center gap-4">
+          <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border border-zinc-200 bg-white flex-shrink-0">
+            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-contain p-2" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=900&h=900&fit=crop'; this.classList.remove('object-contain'); this.classList.add('object-cover'); this.classList.remove('p-2');">
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-medium text-zinc-900 text-base sm:text-lg truncate">${product.name}</h3>
+            <p class="text-zinc-500 text-sm mt-0.5 truncate">${product.store} · ${product.location}</p>
+            <p class="text-zinc-500 text-sm mt-1 line-clamp-2">${product.blurb}</p>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <p class="text-sm font-medium text-zinc-900">${formatPrice(product.price)}</p>
+            <p class="text-xs text-zinc-500 mt-1">Rating ${product.rating.toFixed(1)}</p>
+          </div>
+        </div>
+        <div class="mt-3 flex justify-end">
+          <button class="px-4 py-2 rounded-full border border-zinc-300 text-zinc-700 text-sm font-medium hover:border-zinc-400 transition-colors" data-action="toggle-details">View details in chat</button>
+        </div>
+        ${buildDetailsPanel(product, queryText)}
+      `;
+
+      const toggleButton = card.querySelector('[data-action="toggle-details"]');
+      const details = card.querySelector('[data-role="details"]');
+      const checkoutLink = card.querySelector('[data-action="go-checkout"]');
+      const detailsLink = card.querySelector('[data-action="go-details"]');
+
+      const saveSelection = () => {
+        sessionStorage.setItem("hweibo.selectedProduct", JSON.stringify(product));
+      };
+
+      toggleButton.addEventListener("click", () => {
+        const isHidden = details.classList.contains("hidden");
+        details.classList.toggle("hidden");
+        toggleButton.textContent = isHidden ? "Hide details" : "View details in chat";
+      });
+      checkoutLink.addEventListener("click", saveSelection);
+      detailsLink.addEventListener("click", saveSelection);
+
+      return card;
+    }
+
+    function renderPromptButtons() {
+      samplePromptRow.innerHTML = "";
+      SAMPLE_PROMPTS.forEach((prompt) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "px-4 py-2 rounded-full border border-zinc-200 bg-white text-sm text-zinc-700 hover:border-zinc-400 transition-colors";
+        button.textContent = prompt;
+        button.addEventListener("click", () => runSearch(prompt));
+        samplePromptRow.appendChild(button);
+      });
+    }
+
+    function renderResults(queryText) {
+      const cleanQuery = (queryText || "").trim();
+      if (!cleanQuery) return;
+
+      userQueryText.textContent = cleanQuery;
+      searchInput.value = cleanQuery;
+
+      const { matches, category, budget } = searchProducts(cleanQuery);
+      resultsList.innerHTML = "";
+
+      if (!matches.length) {
+        aiMessageText.textContent = `No strict matches found for "${cleanQuery}". Try one of the sample prompts.`;
+        foundCountText.textContent = "No direct products matched";
+        return;
+      }
+
+      const categoryLabel = category ? ` in ${category}` : "";
+      const budgetLabel = budget ? ` under ${formatPrice(budget)}` : "";
+      aiMessageText.textContent = `Showing ${matches.length} accurate match${matches.length > 1 ? "es" : ""}${categoryLabel}${budgetLabel}.`;
+      foundCountText.textContent = `Found ${matches.length} matching products`;
+
+      matches.forEach((product) => {
+        resultsList.appendChild(buildCard(product, cleanQuery));
+      });
+    }
+
+    function runSearch(queryText) {
+      const clean = (queryText || "").trim();
+      if (!clean) return;
+      history.replaceState({}, "", `search.html?q=${encodeURIComponent(clean)}`);
+      renderResults(clean);
+    }
+
+    document.getElementById("searchBtn").addEventListener("click", () => runSearch(searchInput.value));
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") runSearch(searchInput.value);
+    });
+
+    renderPromptButtons();
+    runSearch(initialQuery);
+  </script>
+  <script defer src="../proto-nav.js"></script>
+</body>
+</html>

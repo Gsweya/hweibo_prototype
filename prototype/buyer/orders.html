@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orders - Hweibo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .delivery-map-overlay { pointer-events: none; }
+    .delivery-pin {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: #18181b;
+      border: 2px solid #ffffff;
+      transform: translate(-50%, -50%);
+    }
+    .delivery-map-card {
+      position: absolute;
+      min-width: 165px;
+      max-width: 210px;
+      border-radius: 12px;
+      border: 1px solid #e4e4e7;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 10px;
+    }
+    .delivery-map-card p {
+      margin: 0;
+    }
+    .delivery-map-card .meta {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: #71717a;
+    }
+    .delivery-map-card .title {
+      margin-top: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #18181b;
+      line-height: 1.2;
+    }
+    .delivery-map-card .sub {
+      margin-top: 2px;
+      font-size: 11px;
+      color: #52525b;
+      line-height: 1.2;
+    }
+    .delivery-map-status {
+      display: inline-block;
+      margin-top: 6px;
+      border-radius: 999px;
+      border: 1px solid #e4e4e7;
+      background: #fafafa;
+      padding: 2px 7px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #3f3f46;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-white" data-proto-active="orders">
+  <!-- Sidebar -->
+  <a href="index.html" class="fixed left-4 sm:left-6 top-6 z-50 text-sm sm:text-base font-extrabold text-zinc-900 hover:text-black transition-colors">
+    HWEIBO
+  </a>
+
+  <div class="fixed left-4 sm:left-6 top-1/2 -translate-y-1/2 z-50">
+    <nav data-proto-nav="buyers" class="flex flex-col items-start">
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="search" href="search.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span>Search</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="browse" href="browse.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          <span>Browse</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="orders" href="orders.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>Orders</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="wallet" href="wallet.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+          <span>Wallet</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="cart" href="checkout.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          <span>Cart</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="profile" href="profile.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pl-24 sm:pl-32">
+      <h1 class="text-3xl font-extrabold text-zinc-900 mb-2">Orders</h1>
+      <p class="text-zinc-500 mb-8">Track your orders and view delivery status</p>
+
+     <!-- Delivery Snapshot Map -->
+     <div class="rounded-3xl border border-zinc-200 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 overflow-hidden mb-8">
+       <div class="p-6 sm:p-8">
+         <div class="flex items-start justify-between gap-6">
+           <div>
+             <p class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Delivery snapshot</p>
+             <h2 class="mt-2 text-xl sm:text-2xl font-extrabold text-zinc-900">Shop to your door</h2>
+             <p class="mt-2 text-sm text-zinc-500">A quick visual route for your latest order.</p>
+           </div>
+           <div class="hidden sm:flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-700">
+             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17h4V5H2v12h3"/><path d="M20 17h2v-3.34a2 2 0 0 0-.59-1.42L18 9h-4v8h2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+             In transit
+           </div>
+         </div>
+
+         <div class="mt-6 grid gap-4 sm:grid-cols-2">
+           <div class="rounded-2xl bg-white/80 backdrop-blur border border-zinc-200 p-4">
+             <div class="flex items-start gap-3">
+               <div class="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-900 text-white">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+               </div>
+               <div class="min-w-0">
+                 <p class="text-xs font-bold uppercase tracking-wider text-zinc-500">From</p>
+                 <p class="mt-1 font-bold text-zinc-900 truncate">Watch Hub</p>
+                 <p class="text-sm text-zinc-500 truncate">Dar es Salaam</p>
+               </div>
+             </div>
+           </div>
+
+           <div class="rounded-2xl bg-white/80 backdrop-blur border border-zinc-200 p-4">
+             <div class="flex items-start gap-3">
+               <div class="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-100 text-zinc-900">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19 7-7 3 3-7 7-3-3Z"/><path d="m18 13-1.5-1.5"/><path d="m2 22 2-2"/><path d="m3 21 1-1"/><path d="M14 10 4 20"/></svg>
+               </div>
+               <div class="min-w-0">
+                 <p class="text-xs font-bold uppercase tracking-wider text-zinc-500">To</p>
+                 <p class="mt-1 font-bold text-zinc-900 truncate">Alexander Hamilton</p>
+                 <p class="text-sm text-zinc-500 truncate">Manhattan, New York</p>
+               </div>
+             </div>
+           </div>
+         </div>
+
+         <div class="mt-6 rounded-2xl border border-zinc-200 bg-white p-4">
+           <div class="flex items-center justify-between mb-3">
+             <p class="text-sm font-medium text-zinc-700">Live route simulation (Nyerere Square, Dodoma)</p>
+             <button id="expandBuyerMapBtn" class="text-sm text-zinc-600 hover:text-black">Expand map</button>
+           </div>
+           <div class="relative h-[220px] rounded-2xl overflow-hidden border border-zinc-200">
+             <iframe id="buyerOrderMap" class="absolute inset-0 w-full h-full" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Nyerere+Square+Dodoma&output=embed"></iframe>
+             <div class="delivery-map-overlay absolute inset-0">
+               <div class="delivery-pin" style="left:18%; top:63%"></div>
+               <div class="delivery-map-card" style="left:20%; top:48%">
+                 <p class="meta">Pickup</p>
+                 <p class="title">Watch Hub</p>
+                 <p class="sub">Order HW-12345 · Luna Steel Watch</p>
+                 <span class="delivery-map-status">Packed</span>
+               </div>
+               <div class="delivery-pin" style="left:79%; top:40%"></div>
+               <div class="delivery-map-card" style="right:4%; top:22%">
+                 <p class="meta">Destination</p>
+                 <p class="title">Alexander Hamilton</p>
+                 <p class="sub">Manhattan delivery point</p>
+                 <span class="delivery-map-status">In transit</span>
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+
+    <!-- Order Tabs -->
+    <div class="flex gap-4 mb-8 border-b border-zinc-200">
+      <button class="pb-4 text-black font-bold border-b-2 border-black">All Orders</button>
+      <button class="pb-4 text-zinc-500 font-medium hover:text-black">Processing</button>
+      <button class="pb-4 text-zinc-500 font-medium hover:text-black">Delivered</button>
+      <button class="pb-4 text-zinc-500 font-medium hover:text-black">Cancelled</button>
+    </div>
+
+    <!-- Orders List -->
+    <div class="space-y-4">
+      <!-- Order 1 -->
+      <div class="bg-white rounded-2xl border border-zinc-200 p-6">
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <p class="text-sm text-zinc-500">Order #HW-12345</p>
+            <p class="text-zinc-400 text-sm">Placed on Jan 15, 2024</p>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-semibold">In Transit</span>
+        </div>
+        <div class="flex items-center gap-4 mb-4">
+          <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100&h=100&fit=crop" alt="Product" class="w-16 h-16 rounded-lg object-cover">
+          <div class="flex-1">
+            <h3 class="font-semibold text-zinc-900">Luna Steel Watch</h3>
+            <p class="text-sm text-zinc-500">Qty: 1 · Watch Hub</p>
+          </div>
+          <span class="font-bold text-zinc-900">TZS 285k</span>
+        </div>
+        <div class="flex items-center justify-between pt-4 border-t border-zinc-100">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+            <span class="text-sm text-zinc-600">Estimated delivery: Jan 20</span>
+          </div>
+          <button class="text-sm font-medium text-black hover:underline buyer-track-btn">Track Order</button>
+        </div>
+      </div>
+
+      <!-- Order 2 -->
+      <div class="bg-white rounded-2xl border border-zinc-200 p-6">
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <p class="text-sm text-zinc-500">Order #HW-12344</p>
+            <p class="text-zinc-400 text-sm">Placed on Jan 10, 2024</p>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold">Delivered</span>
+        </div>
+        <div class="flex items-center gap-4 mb-4">
+          <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100&h=100&fit=crop" alt="Product" class="w-16 h-16 rounded-lg object-cover">
+          <div class="flex-1">
+            <h3 class="font-semibold text-zinc-900">Studio Pro Wireless</h3>
+            <p class="text-sm text-zinc-500">Qty: 1 · Audio Center</p>
+          </div>
+          <span class="font-bold text-zinc-900">TZS 420k</span>
+        </div>
+        <div class="flex items-center justify-between pt-4 border-t border-zinc-100">
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600"><path d="M20 6 9 17l-5-5"/></svg>
+            <span class="text-sm text-zinc-600">Delivered on Jan 14</span>
+          </div>
+          <button class="text-sm font-medium text-black hover:underline">View Details</button>
+        </div>
+      </div>
+
+      <!-- Order 3 -->
+      <div class="bg-white rounded-2xl border border-zinc-200 p-6">
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <p class="text-sm text-zinc-500">Order #HW-12340</p>
+            <p class="text-zinc-400 text-sm">Placed on Jan 5, 2024</p>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold">Delivered</span>
+        </div>
+        <div class="flex items-center gap-4 mb-4">
+          <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100&h=100&fit=crop" alt="Product" class="w-16 h-16 rounded-lg object-cover">
+          <div class="flex-1">
+            <h3 class="font-semibold text-zinc-900">Aero Sprint V2</h3>
+            <p class="text-sm text-zinc-500">Qty: 2 · Sport World</p>
+          </div>
+          <span class="font-bold text-zinc-900">TZS 290k</span>
+        </div>
+        <div class="flex items-center justify-between pt-4 border-t border-zinc-100">
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600"><path d="M20 6 9 17l-5-5"/></svg>
+            <span class="text-sm text-zinc-600">Delivered on Jan 8</span>
+          </div>
+          <button class="text-sm font-medium text-black hover:underline">View Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="buyerMapModal" class="hidden fixed inset-0 z-[70] bg-black/50 p-4 sm:p-8">
+    <div class="bg-white w-full h-full rounded-2xl overflow-hidden border border-zinc-200">
+      <div class="h-14 px-4 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
+        <p class="font-medium text-zinc-800">Expanded delivery tracking map</p>
+        <button id="closeBuyerMapModal" class="px-3 py-1.5 rounded-lg border border-zinc-200 text-sm text-zinc-600 hover:text-black">Close</button>
+      </div>
+      <div class="relative h-[calc(100%-56px)]">
+        <iframe class="absolute inset-0 w-full h-full" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Nyerere+Square+Dodoma&output=embed"></iframe>
+        <div class="delivery-map-overlay absolute inset-0">
+          <div class="delivery-pin" style="left:18%; top:63%"></div>
+          <div class="delivery-map-card" style="left:20%; top:48%">
+            <p class="meta">Pickup</p>
+            <p class="title">Watch Hub</p>
+            <p class="sub">Order HW-12345 · Luna Steel Watch</p>
+            <span class="delivery-map-status">Packed</span>
+          </div>
+          <div class="delivery-pin" style="left:79%; top:40%"></div>
+          <div class="delivery-map-card" style="right:4%; top:22%">
+            <p class="meta">Destination</p>
+            <p class="title">Alexander Hamilton</p>
+            <p class="sub">Manhattan delivery point</p>
+            <span class="delivery-map-status">In transit</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const buyerMapModal = document.getElementById("buyerMapModal");
+    document.getElementById("expandBuyerMapBtn").addEventListener("click", () => buyerMapModal.classList.remove("hidden"));
+    document.getElementById("closeBuyerMapModal").addEventListener("click", () => buyerMapModal.classList.add("hidden"));
+    document.querySelectorAll(".buyer-track-btn").forEach((btn) => {
+      btn.addEventListener("click", () => buyerMapModal.classList.remove("hidden"));
+    });
+  </script>
+  <script defer src="../proto-nav.js"></script>
+</body>
+</html>

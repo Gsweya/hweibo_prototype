@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Users - Admin - hweibo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="min-h-screen bg-white" data-admin-active="users">
+  <a href="../landing.html" class="fixed left-4 sm:left-6 top-6 z-50 text-sm sm:text-base font-extrabold text-zinc-900 hover:text-black transition-colors">
+    HWEIBO
+  </a>
+
+  <div class="fixed left-4 sm:left-6 top-1/2 -translate-y-1/2 z-50">
+    <nav data-admin-nav class="flex flex-col items-start">
+      <a data-admin-id="dashboard" href="index.html"><span>Dashboard</span></a>
+      <a data-admin-id="users" href="users.html"><span>Users</span></a>
+      <a data-admin-id="new-user" href="new-user.html"><span>Add user</span></a>
+      <a data-admin-id="seller-view" href="../seller/index.html"><span>Seller view</span></a>
+      <a data-admin-id="buyer-view" href="../buyer/search.html"><span>Buyer view</span></a>
+    </nav>
+  </div>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pl-24 sm:pl-32">
+    <div class="flex items-start justify-between gap-6">
+      <div>
+        <h1 class="text-3xl font-extrabold text-zinc-900">Users</h1>
+        <p class="mt-2 text-zinc-500">Search and filter users by role.</p>
+      </div>
+      <a href="new-user.html" class="px-5 py-3 rounded-full bg-black text-white font-semibold hover:bg-zinc-800">Add user</a>
+    </div>
+
+    <div class="mt-8 rounded-3xl border border-zinc-200 bg-white overflow-hidden">
+      <div class="p-4 sm:p-6 border-b border-zinc-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="flex items-center gap-3 flex-wrap">
+          <input id="userSearch" class="w-72 max-w-[70vw] rounded-full border border-zinc-200 px-4 py-2 text-sm focus:outline-none focus:border-black" placeholder="Search users..." />
+          <select id="roleFilter" class="rounded-full border border-zinc-200 px-4 py-2 text-sm focus:outline-none focus:border-black">
+            <option value="all">All roles</option>
+            <option value="buyer">Buyer</option>
+            <option value="seller">Seller</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <span id="userCount" class="text-sm text-zinc-500">0 users</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="bg-zinc-50 border-b border-zinc-200 text-zinc-600">
+            <tr>
+              <th class="text-left px-6 py-3 font-semibold">Name</th>
+              <th class="text-left px-6 py-3 font-semibold">Email</th>
+              <th class="text-left px-6 py-3 font-semibold">Role</th>
+              <th class="text-left px-6 py-3 font-semibold">Status</th>
+            </tr>
+          </thead>
+          <tbody id="usersRows" class="divide-y divide-zinc-100"></tbody>
+        </table>
+      </div>
+      <p id="emptyUsers" class="hidden p-6 text-sm text-zinc-500">No users match the selected filter.</p>
+    </div>
+  </main>
+
+  <script defer src="admin-demo.js"></script>
+  <script defer src="admin-nav.js"></script>
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const users = window.AdminDemo.readUsers();
+      const searchInput = document.getElementById("userSearch");
+      const roleFilter = document.getElementById("roleFilter");
+      const rows = document.getElementById("usersRows");
+      const count = document.getElementById("userCount");
+      const empty = document.getElementById("emptyUsers");
+
+      function render() {
+        const term = searchInput.value.trim().toLowerCase();
+        const role = roleFilter.value;
+        const filtered = users.filter((user) => {
+          const matchesSearch = !term || user.fullName.toLowerCase().includes(term) || user.email.toLowerCase().includes(term);
+          const matchesRole = role === "all" || user.role === role;
+          return matchesSearch && matchesRole;
+        });
+
+        count.textContent = `${filtered.length} users`;
+        empty.classList.toggle("hidden", filtered.length !== 0);
+
+        rows.innerHTML = filtered.map((user) => `
+          <tr>
+            <td class="px-6 py-4 font-semibold text-zinc-900">${user.fullName}</td>
+            <td class="px-6 py-4 text-zinc-700">${user.email}</td>
+            <td class="px-6 py-4"><span class="px-2 py-1 rounded-full border border-zinc-200 bg-zinc-50 text-zinc-700 uppercase">${user.role}</span></td>
+            <td class="px-6 py-4 text-zinc-700 capitalize">${user.status}</td>
+          </tr>
+        `).join("");
+      }
+
+      searchInput.addEventListener("input", render);
+      roleFilter.addEventListener("change", render);
+      render();
+    });
+  </script>
+</body>
+</html>

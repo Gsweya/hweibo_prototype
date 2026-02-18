@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse - Hweibo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen bg-[#f6f6f8]" data-proto-active="browse">
+  <a href="index.html" class="fixed left-4 sm:left-6 top-6 z-50 text-sm sm:text-base font-extrabold text-zinc-900 hover:text-black transition-colors">
+    HWEIBO
+  </a>
+
+  <div class="fixed left-4 sm:left-6 top-1/2 -translate-y-1/2 z-50">
+    <nav data-proto-nav="buyers" class="flex flex-col items-start">
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="search" href="search.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span>Search</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="browse" href="browse.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          <span>Browse</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="orders" href="orders.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>Orders</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="wallet" href="wallet.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+          <span>Wallet</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="cart" href="checkout.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          <span>Cart</span>
+        </a>
+      </div>
+      <div data-proto-row style="max-height:0; opacity:0; pointer-events:none;" class="transition-all duration-300 ease-out overflow-hidden">
+        <a data-proto-id="profile" href="profile.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pl-24 sm:pl-32">
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-3 overflow-x-auto pb-2">
+        <button data-filter="all" class="browse-filter px-6 py-3 rounded-full bg-black text-white font-semibold text-sm whitespace-nowrap">All</button>
+        <button data-filter="laptop" class="browse-filter px-6 py-3 rounded-full bg-white text-black border border-zinc-200 font-semibold text-sm whitespace-nowrap hover:border-zinc-300">Laptops</button>
+        <button data-filter="shoes" class="browse-filter px-6 py-3 rounded-full bg-white text-black border border-zinc-200 font-semibold text-sm whitespace-nowrap hover:border-zinc-300">Shoes</button>
+        <button data-filter="phone" class="browse-filter px-6 py-3 rounded-full bg-white text-black border border-zinc-200 font-semibold text-sm whitespace-nowrap hover:border-zinc-300">Phones</button>
+        <button data-filter="audio" class="browse-filter px-6 py-3 rounded-full bg-white text-black border border-zinc-200 font-semibold text-sm whitespace-nowrap hover:border-zinc-300">Audio</button>
+      </div>
+      <span id="productCount" class="text-sm text-zinc-500">0 products</span>
+    </div>
+
+    <div id="browseGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </main>
+
+  <script>
+    const PRODUCTS = [
+      { id: "lap-ideapad", category: "laptop", name: "Lenovo IdeaPad 5", price: 1850000, store: "Hweibo Tech", location: "Dodoma", image: "../assets/product_images/laptops/lenovo-idea-pad.avif", blurb: "Balanced performance for work and school." },
+      { id: "lap-zenbook", category: "laptop", name: "Asus Zenbook 14", price: 1940000, store: "Laptop City", location: "Dar es Salaam", image: "../assets/product_images/laptops/asus-zenbook.jpg", blurb: "Slim ultrabook with premium battery life." },
+      { id: "lap-xps17", category: "laptop", name: "Dell XPS 17", price: 3980000, store: "Premium Tech", location: "Mwanza", image: "../assets/product_images/laptops/xps-17.avif", blurb: "High-end display and power for creators." },
+      { id: "lap-legion", category: "laptop", name: "Lenovo Legion Pro", price: 2760000, store: "GameCore", location: "Arusha", image: "../assets/product_images/laptops/lenovo-legion-pro.webp", blurb: "Gaming-ready build with dedicated GPU." },
+
+      { id: "shoe-airmax", category: "shoes", name: "Nike Air Max Plus", price: 385000, store: "Sport World", location: "Dodoma", image: "../assets/product_images/shoes/Nike-Air-Max-Plus.webp", blurb: "Responsive cushioning for daily runs." },
+      { id: "shoe-puma", category: "shoes", name: "Puma Sport Runner", price: 268000, store: "Athletic Hub", location: "Dar es Salaam", image: "../assets/product_images/shoes/puma-sport.jpg", blurb: "Breathable upper and lightweight feel." },
+      { id: "shoe-galaxy", category: "shoes", name: "Adidas Galaxy 5", price: 219000, store: "Move Store", location: "Arusha", image: "../assets/product_images/shoes/galaxy-5-trainers-with-laces.jpg", blurb: "Affordable trainer for everyday workouts." },
+      { id: "shoe-balance", category: "shoes", name: "New Balance Wake Up", price: 449000, store: "Runner's Lab", location: "Mwanza", image: "../assets/product_images/shoes/new-balance-wake-up.webp", blurb: "Soft foam support for long-distance comfort." },
+
+      { id: "phone-iphone14", category: "phone", name: "iPhone 14 Pro", price: 2950000, store: "Mobile One", location: "Dodoma", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=900&fit=crop", blurb: "Excellent camera system and smooth video." },
+      { id: "phone-s23", category: "phone", name: "Samsung Galaxy S23", price: 2140000, store: "Tech Point", location: "Dar es Salaam", image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=800&h=900&fit=crop", blurb: "Flagship Android performance and camera." },
+
+      { id: "audio-studio", category: "audio", name: "Studio Pro Wireless", price: 420000, store: "Audio Center", location: "Mwanza", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=900&fit=crop", blurb: "Strong noise cancellation and rich sound." },
+      { id: "watch-luna", category: "accessories", name: "Luna Steel Watch", price: 285000, store: "Watch Hub", location: "Dar es Salaam", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=900&fit=crop", blurb: "Classic metal build for everyday wear." }
+    ];
+
+    const grid = document.getElementById("browseGrid");
+    const productCount = document.getElementById("productCount");
+    const filters = Array.from(document.querySelectorAll(".browse-filter"));
+
+    function formatTzs(value) {
+      const amount = Math.max(0, Math.round(Number(value) || 0));
+      if (amount >= 1000000) {
+        const compact = (amount / 1000000).toFixed(amount % 1000000 === 0 ? 0 : 1);
+        return `TZS ${compact.replace(/\.0$/, "")}M`;
+      }
+      if (amount >= 1000) {
+        const compact = (amount / 1000).toFixed(amount % 1000 === 0 ? 0 : 1);
+        return `TZS ${compact.replace(/\.0$/, "")}k`;
+      }
+      return `TZS ${amount}`;
+    }
+
+    function cardTemplate(product) {
+      return `
+        <article class="proto-browse-card group cursor-pointer rounded-[32px] bg-white border border-zinc-200 hover:border-zinc-300 transition-colors overflow-hidden" data-product-id="${product.id}">
+          <div class="relative aspect-[3/4] overflow-hidden bg-zinc-50">
+            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-contain p-3" loading="lazy">
+          </div>
+          <div class="p-5 space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <h3 class="font-medium text-zinc-900 text-lg line-clamp-1">${product.name}</h3>
+              <span class="font-medium text-zinc-900 whitespace-nowrap">${formatTzs(product.price)}</span>
+            </div>
+            <p class="text-sm text-zinc-600 line-clamp-2">${product.blurb}</p>
+            <p class="text-xs text-zinc-500">${product.store} · ${product.location}</p>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderProducts(filter = "all") {
+      const list = filter === "all" ? PRODUCTS : PRODUCTS.filter((item) => item.category === filter);
+      grid.innerHTML = list.map(cardTemplate).join("");
+      productCount.textContent = `${list.length} products`;
+    }
+
+    function setActiveFilter(filterValue) {
+      filters.forEach((button) => {
+        const active = button.dataset.filter === filterValue;
+        button.classList.toggle("bg-black", active);
+        button.classList.toggle("text-white", active);
+        button.classList.toggle("bg-white", !active);
+      });
+    }
+
+    filters.forEach((button) => {
+      button.addEventListener("click", () => {
+        const filter = button.dataset.filter || "all";
+        setActiveFilter(filter);
+        renderProducts(filter);
+      });
+    });
+
+    grid.addEventListener("click", (event) => {
+      const card = event.target.closest("[data-product-id]");
+      if (!card) return;
+      const product = PRODUCTS.find((item) => item.id === card.dataset.productId);
+      if (!product) return;
+
+      sessionStorage.setItem("hweibo.selectedProduct", JSON.stringify(product));
+      const next = new URLSearchParams({
+        id: product.id,
+        name: product.name,
+        product: product.name,
+        price: String(product.price),
+        store: product.store,
+        location: product.location,
+        image: product.image,
+        source: "browse"
+      });
+      window.location.href = `product-details.html?${next.toString()}`;
+    });
+
+    setActiveFilter("all");
+    renderProducts("all");
+  </script>
+  <script defer src="../proto-nav.js"></script>
+</body>
+</html>
