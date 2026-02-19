@@ -1,22 +1,102 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, MoreVertical, Edit, Trash2 } from "lucide-react";
+import { Plus, Search, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { formatPriceFull } from "@/lib/price-utils";
 
-const products = [
-  { id: 1, name: "Nike Air Max 90", price: "TZS 450,000", stock: 25, sales: 45, status: "Active", image: "/product_images/shoes/nike-airmax-90.webp" },
-  { id: 2, name: "Puma Sport Runner", price: "TZS 320,000", stock: 18, sales: 38, status: "Active", image: "/product_images/shoes/puma-sport.jpg" },
-  { id: 3, name: "New Balance Fresh Foam", price: "TZS 520,000", stock: 12, sales: 32, status: "Low Stock", image: "/product_images/shoes/new-balance-wake-up.webp" },
-  { id: 4, name: "Adidas Galaxy 5", price: "TZS 280,000", stock: 30, sales: 28, status: "Active", image: "/product_images/shoes/galaxy-5-trainers-with-laces.jpg" },
-  { id: 5, name: "Nike Air Max Plus", price: "TZS 680,000", stock: 8, sales: 15, status: "Low Stock", image: "/product_images/shoes/Nike-Air-Max-Plus.webp" },
-  { id: 6, name: "Nike Air Max 720", price: "TZS 750,000", stock: 5, sales: 10, status: "Out of Stock", image: "/product_images/shoes/nke-air-max-720-black.webp" },
+type SellerProduct = {
+  id: number;
+  title: string;
+  price_cents: number;
+  stock_units: number;
+  sales_units: number;
+  status: string;
+  images: string[];
+  category: string;
+};
+
+type SellerProductsPayload = {
+  products: SellerProduct[];
+  feeder_lines: string[];
+};
+
+const fallbackProducts: SellerProduct[] = [
+  {
+    id: 1,
+    title: "Nike Air Max 90",
+    price_cents: 450000,
+    stock_units: 25,
+    sales_units: 45,
+    status: "Active",
+    images: ["/product_images/shoes/nike-airmax-90.webp"],
+    category: "Shoes",
+  },
+  {
+    id: 2,
+    title: "Puma Sport Runner",
+    price_cents: 320000,
+    stock_units: 18,
+    sales_units: 38,
+    status: "Active",
+    images: ["/product_images/shoes/puma-sport.jpg"],
+    category: "Shoes",
+  },
 ];
 
 export default function ProductsPage() {
+  const [products, setProducts] = useState<SellerProduct[]>(fallbackProducts);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [feederLines, setFeederLines] = useState<string[]>([
+    "Starter feed: product rows connected to backend.",
+  ]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch("/api/seller/products?limit=80", { cache: "no-store" });
+        if (!res.ok) throw new Error(`seller_products_${res.status}`);
+        const data = (await res.json()) as SellerProductsPayload;
+        if (!mounted) return;
+        if (Array.isArray(data.products) && data.products.length > 0) {
+          setProducts(data.products);
+        }
+        if (Array.isArray(data.feeder_lines) && data.feeder_lines.length > 0) {
+          setFeederLines(data.feeder_lines);
+        }
+      } catch {
+        if (!mounted) return;
+        setProducts(fallbackProducts);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    void load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const filteredProducts = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
+    if (!q) return products;
+    return products.filter((p) => `${p.title} ${p.category}`.toLowerCase().includes(q));
+  }, [products, searchTerm]);
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      {/* Header */}
+      <div className="rounded-2xl border border-zinc-200 bg-white p-4">
+        {feederLines.map((line) => (
+          <p key={line} className="text-sm text-zinc-600">
+            {line}
+          </p>
+        ))}
+      </div>
+
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -24,6 +104,8 @@ export default function ProductsPage() {
             <input
               type="text"
               placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 pr-4 py-2 rounded-full border border-gray-200 text-sm focus:outline-none focus:border-black w-64"
             />
           </div>
@@ -36,7 +118,6 @@ export default function ProductsPage() {
         </Link>
       </div>
 
-      {/* Products Table */}
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-100">
@@ -50,26 +131,33 @@ export default function ProductsPage() {
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <tr key={product.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-gray-100 overflow-hidden">
-                      <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                      <img
+                        src={(product.images && product.images[0]) || "/product_images/canon_camera.jpg"}
+                        alt={product.title}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <span className="font-semibold text-black">{product.name}</span>
+                    <div>
+                      <span className="font-semibold text-black">{product.title}</span>
+                      <p className="text-xs text-gray-500">{product.category}</p>
+                    </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 font-medium text-black">{product.price}</td>
-                <td className="px-6 py-4 text-gray-600">{product.stock} units</td>
-                <td className="px-6 py-4 text-gray-600">{product.sales} sold</td>
+                <td className="px-6 py-4 font-medium text-black">{formatPriceFull(product.price_cents)}</td>
+                <td className="px-6 py-4 text-gray-600">{product.stock_units} units</td>
+                <td className="px-6 py-4 text-gray-600">{product.sales_units} sold</td>
                 <td className="px-6 py-4">
                   <span className={`text-xs px-3 py-1 rounded-full font-medium ${
-                    product.status === "Active" 
-                      ? "bg-green-100 text-green-700" 
+                    product.status === "Active"
+                      ? "bg-green-100 text-green-700"
                       : product.status === "Low Stock"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : "bg-red-100 text-red-700"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-red-100 text-red-700"
                   }`}>
                     {product.status}
                   </span>
@@ -86,6 +174,13 @@ export default function ProductsPage() {
                 </td>
               </tr>
             ))}
+            {!filteredProducts.length && !loading ? (
+              <tr>
+                <td className="px-6 py-8 text-sm text-gray-500" colSpan={6}>
+                  No products matched your search.
+                </td>
+              </tr>
+            ) : null}
           </tbody>
         </table>
       </div>

@@ -1,37 +1,117 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, TrendingUp, Package, ShoppingCart, DollarSign } from "lucide-react";
 import Link from "next/link";
+import { formatPriceFull } from "@/lib/price-utils";
 
-const stats = [
-  { label: "Total Sales", value: "TZS 12,450,000", change: "+12.5%", icon: DollarSign },
-  { label: "Total Orders", value: "156", change: "+8.2%", icon: ShoppingCart },
-  { label: "Products", value: "43", change: "+3", icon: Package },
-  { label: "Conversion Rate", value: "3.2%", change: "+0.5%", icon: TrendingUp },
-];
+type DashboardStats = {
+  total_sales_cents: number;
+  total_orders: number;
+  total_products: number;
+  conversion_rate: number;
+};
 
-const recentOrders = [
-  { id: "#ORD-001", customer: "James Madenge", product: "Nike Air Max 90", amount: "TZS 450,000", status: "Completed" },
-  { id: "#ORD-002", customer: "Sarah Johnson", product: "Puma Sport Runner", amount: "TZS 320,000", status: "Processing" },
-  { id: "#ORD-003", customer: "Michael Brown", product: "New Balance Fresh Foam", amount: "TZS 520,000", status: "Pending" },
-  { id: "#ORD-004", customer: "Emily Davis", product: "Adidas Galaxy 5", amount: "TZS 280,000", status: "Completed" },
-];
+type DashboardOrder = {
+  id: string;
+  customer_name: string;
+  product_title: string;
+  amount_cents: number;
+  status: string;
+};
 
-const topProducts = [
-  { name: "Nike Air Max 90", sales: 45, revenue: "TZS 20,250,000" },
-  { name: "Puma Sport Runner", sales: 38, revenue: "TZS 12,160,000" },
-  { name: "New Balance Fresh Foam", sales: 32, revenue: "TZS 16,640,000" },
-  { name: "Adidas Galaxy 5", sales: 28, revenue: "TZS 7,840,000" },
-];
+type DashboardTopProduct = {
+  id: number;
+  title: string;
+  sales_units: number;
+  revenue_cents: number;
+  price_cents: number;
+  status: string;
+  stock_units: number;
+  image: string;
+};
+
+type DashboardPayload = {
+  stats: DashboardStats;
+  recent_orders: DashboardOrder[];
+  top_products: DashboardTopProduct[];
+  feeder_lines: string[];
+};
+
+const fallbackData: DashboardPayload = {
+  stats: {
+    total_sales_cents: 12450000,
+    total_orders: 156,
+    total_products: 43,
+    conversion_rate: 3.2,
+  },
+  recent_orders: [
+    { id: "HW-202600", customer_name: "James Madenge", product_title: "Nike Air Max 90", amount_cents: 450000, status: "Completed" },
+    { id: "HW-202601", customer_name: "Sarah Johnson", product_title: "Puma Sport Runner", amount_cents: 320000, status: "Processing" },
+    { id: "HW-202602", customer_name: "Michael Brown", product_title: "New Balance Fresh Foam", amount_cents: 520000, status: "Pending" },
+  ],
+  top_products: [
+    { id: 1, title: "Nike Air Max 90", sales_units: 45, revenue_cents: 20250000, price_cents: 450000, status: "Active", stock_units: 25, image: "/product_images/shoes/nike-airmax-90.webp" },
+    { id: 2, title: "Puma Sport Runner", sales_units: 38, revenue_cents: 12160000, price_cents: 320000, status: "Active", stock_units: 18, image: "/product_images/shoes/puma-sport.jpg" },
+  ],
+  feeder_lines: [
+    "Starter feed: seller dashboard loaded from fallback data.",
+  ],
+};
 
 export default function DashboardPage() {
+  const [data, setData] = useState<DashboardPayload>(fallbackData);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch("/api/seller/dashboard", { cache: "no-store" });
+        if (!res.ok) throw new Error(`seller_dashboard_${res.status}`);
+        const payload = (await res.json()) as DashboardPayload;
+        if (!mounted) return;
+        if (payload && payload.stats && Array.isArray(payload.recent_orders)) {
+          setData(payload);
+        }
+      } catch {
+        if (!mounted) return;
+        setData(fallbackData);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    void load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const stats = useMemo(
+    () => [
+      { label: "Total Sales", value: formatPriceFull(data.stats.total_sales_cents), icon: DollarSign },
+      { label: "Total Orders", value: String(data.stats.total_orders), icon: ShoppingCart },
+      { label: "Products", value: String(data.stats.total_products), icon: Package },
+      { label: "Conversion Rate", value: `${data.stats.conversion_rate}%`, icon: TrendingUp },
+    ],
+    [data.stats]
+  );
+
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      {/* Welcome Section */}
+      <div className="rounded-2xl border border-zinc-200 bg-white p-4">
+        {data.feeder_lines.map((line) => (
+          <p key={line} className="text-sm text-zinc-600">
+            {line}
+          </p>
+        ))}
+      </div>
+
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-normal text-black mb-1">Welcome back, Sarah</h1>
+          <h1 className="text-3xl font-normal text-black mb-1">Welcome back, Seller</h1>
           <p className="text-gray-500">Here&apos;s what&apos;s happening with your store today.</p>
         </div>
         <Link href="/sellers/products/new">
@@ -42,7 +122,6 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => {
           const Icon = stat.icon;
@@ -53,7 +132,7 @@ export default function DashboardPage() {
                   <Icon className="w-6 h-6 text-gray-700" />
                 </div>
                 <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                  {stat.change}
+                  Live
                 </span>
               </div>
               <p className="text-2xl font-bold text-black mb-1">{stat.value}</p>
@@ -63,9 +142,7 @@ export default function DashboardPage() {
         })}
       </div>
 
-      {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Orders */}
         <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-black">Recent Orders</h3>
@@ -73,53 +150,58 @@ export default function DashboardPage() {
               View all
             </Link>
           </div>
-          
+
           <div className="space-y-4">
-            {recentOrders.map((order) => (
+            {data.recent_orders.map((order) => (
               <div key={order.id} className="flex items-center justify-between p-4 rounded-xl bg-gray-50">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white text-xs font-bold">
-                    {order.customer.charAt(0)}
+                    {order.customer_name.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-semibold text-black">{order.customer}</p>
-                    <p className="text-sm text-gray-500">{order.product}</p>
+                    <p className="font-semibold text-black">{order.customer_name}</p>
+                    <p className="text-sm text-gray-500">{order.product_title}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-black">{order.amount}</p>
+                  <p className="font-bold text-black">{formatPriceFull(order.amount_cents)}</p>
                   <span className={`text-xs px-2 py-1 rounded-full ${
-                    order.status === "Completed" 
-                      ? "bg-green-100 text-green-700" 
+                    order.status === "Completed"
+                      ? "bg-green-100 text-green-700"
                       : order.status === "Processing"
-                      ? "bg-blue-100 text-blue-700"
-                      : "bg-yellow-100 text-yellow-700"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-yellow-100 text-yellow-700"
                   }`}>
                     {order.status}
                   </span>
                 </div>
               </div>
             ))}
+            {!data.recent_orders.length && !loading ? (
+              <p className="text-sm text-gray-500">No recent orders yet.</p>
+            ) : null}
           </div>
         </div>
 
-        {/* Top Products */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6">
           <h3 className="text-lg font-bold text-black mb-6">Top Products</h3>
-          
+
           <div className="space-y-4">
-            {topProducts.map((product, idx) => (
-              <div key={product.name} className="flex items-center gap-4">
+            {data.top_products.map((product, idx) => (
+              <div key={product.id} className="flex items-center gap-4">
                 <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600">
                   {idx + 1}
                 </span>
                 <div className="flex-1">
-                  <p className="font-semibold text-black text-sm">{product.name}</p>
-                  <p className="text-xs text-gray-500">{product.sales} sales</p>
+                  <p className="font-semibold text-black text-sm">{product.title}</p>
+                  <p className="text-xs text-gray-500">{product.sales_units} sales</p>
                 </div>
-                <p className="text-sm font-bold text-black">{product.revenue}</p>
+                <p className="text-sm font-bold text-black">{formatPriceFull(product.revenue_cents)}</p>
               </div>
             ))}
+            {!data.top_products.length && !loading ? (
+              <p className="text-sm text-gray-500">No products yet.</p>
+            ) : null}
           </div>
 
           <Link href="/sellers/analytics">
@@ -128,33 +210,6 @@ export default function DashboardPage() {
             </Button>
           </Link>
         </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Link href="/sellers/products/new">
-          <div className="bg-black rounded-2xl p-6 text-white hover:bg-gray-800 transition-colors cursor-pointer">
-            <Plus className="w-8 h-8 mb-4" />
-            <h4 className="text-lg font-bold mb-1">Add New Product</h4>
-            <p className="text-sm text-gray-400">List a new item in your store</p>
-          </div>
-        </Link>
-        
-        <Link href="/sellers/orders">
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-gray-300 transition-colors cursor-pointer">
-            <ShoppingCart className="w-8 h-8 mb-4 text-black" />
-            <h4 className="text-lg font-bold mb-1 text-black">Manage Orders</h4>
-            <p className="text-sm text-gray-500">View and process orders</p>
-          </div>
-        </Link>
-        
-        <Link href="/sellers/products">
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-gray-300 transition-colors cursor-pointer">
-            <Package className="w-8 h-8 mb-4 text-black" />
-            <h4 className="text-lg font-bold mb-1 text-black">My Products</h4>
-            <p className="text-sm text-gray-500">Manage your inventory</p>
-          </div>
-        </Link>
       </div>
     </div>
   );

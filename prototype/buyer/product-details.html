@@ -64,6 +64,15 @@
           <p>Delivery simulation includes live route view and tracking in Orders.</p>
         </div>
 
+        <div class="mt-5 rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+          <p class="text-xs uppercase tracking-[0.16em] text-zinc-500">Specifications</p>
+          <ul id="productSpecs" class="mt-3 space-y-1 text-sm text-zinc-700">
+            <li>• Stainless steel body</li>
+            <li>• Water resistant casing</li>
+            <li>• Quartz movement</li>
+          </ul>
+        </div>
+
         <div class="mt-6 rounded-2xl border border-zinc-200 overflow-hidden">
           <div class="px-4 py-3 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
             <p class="text-sm font-medium text-zinc-700">Store location map</p>
@@ -108,12 +117,43 @@
 
     const FALLBACK_PRODUCT = {
       id: "watch-luna",
+      category: "accessories",
       name: "Luna Steel Watch",
       price: 285000,
       store: "Watch Hub",
       location: "Dar es Salaam",
       image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=900&fit=crop"
     };
+
+    function specsForProduct(product) {
+      if (Array.isArray(product.specs) && product.specs.length) return product.specs;
+
+      const byId = {
+        "lap-ideapad": ["Intel Core i5", "16GB RAM", "512GB SSD", "14-inch FHD display"],
+        "lap-zenbook": ["Intel Core i7", "16GB RAM", "512GB SSD", "14-inch OLED display"],
+        "lap-xps17": ["Intel Core i9", "32GB RAM", "1TB SSD", "17-inch UHD display"],
+        "lap-legion": ["Ryzen 7", "16GB RAM", "1TB SSD", "RTX-series graphics"],
+        "shoe-airmax": ["Air-cushion sole", "Breathable mesh upper", "Rubber traction outsole"],
+        "shoe-puma": ["Lightweight foam midsole", "Breathable upper", "Road-ready grip"],
+        "shoe-galaxy": ["Cloudfoam comfort", "Textile upper", "Daily trainer support"],
+        "shoe-balance": ["Soft foam cushioning", "Stability heel support", "Long-run comfort"],
+        "phone-iphone14": ["48MP main camera", "A16 chip", "6.1-inch Super Retina display", "128GB storage"],
+        "phone-s23": ["50MP triple camera", "Snapdragon flagship chip", "6.1-inch AMOLED display", "128GB storage"],
+        "phone-pixel8": ["50MP AI camera", "Google Tensor chip", "6.2-inch OLED display", "128GB storage"],
+        "phone-redmi13": ["200MP main camera", "120Hz AMOLED display", "8GB RAM", "256GB storage"],
+        "audio-studio": ["Active noise cancellation", "40mm drivers", "Up to 30h battery"],
+        "watch-luna": ["Stainless steel body", "Water resistant casing", "Quartz movement"]
+      };
+
+      if (product.id && byId[product.id]) return byId[product.id];
+
+      const category = product.category || "";
+      if (category === "laptop") return ["Modern CPU", "16GB RAM", "Fast SSD storage", "High-resolution display"];
+      if (category === "shoes") return ["Cushioned sole", "Breathable upper", "Durable outsole"];
+      if (category === "phone") return ["Multi-lens camera", "All-day battery", "High refresh display", "Fast chipset"];
+      if (category === "audio") return ["Noise isolation", "Wide frequency range", "Long battery life"];
+      return ["Quality build", "Reliable performance", "In-stock from local seller"];
+    }
 
     const params = new URLSearchParams(window.location.search);
     const source = params.get("source") || "browse";
@@ -157,6 +197,7 @@
           image: fromParams.image || FALLBACK_PRODUCT.image
         };
 
+    selected.specs = specsForProduct(selected);
     sessionStorage.setItem("hweibo.selectedProduct", JSON.stringify(selected));
 
     document.getElementById("productName").textContent = selected.name;
@@ -164,6 +205,7 @@
     document.getElementById("productStore").textContent = selected.store;
     document.getElementById("productLocation").textContent = selected.location;
     document.getElementById("productImage").src = selected.image;
+    document.getElementById("productSpecs").innerHTML = selected.specs.map((spec) => `<li>• ${spec}</li>`).join("");
 
     const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(selected.location + ", Tanzania")}&output=embed`;
     document.getElementById("locationMap").src = mapSrc;

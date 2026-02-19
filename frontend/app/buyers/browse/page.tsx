@@ -1,106 +1,81 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SlidersHorizontal, Heart, X, Store, MapPin, ArrowRight, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart-context";
 import { formatPriceFull } from "@/lib/price-utils";
 
-// Categories
-const categories = [
-  { id: "trending", label: "Trending", active: true },
-  { id: "best-value", label: "Best Value", active: false },
-  { id: "new", label: "New Arrivals", active: false },
-  { id: "fashion", label: "Fashion", active: false },
-  { id: "tech", label: "Tech", active: false },
-  { id: "home", label: "Home", active: false },
-];
+type UiProduct = {
+  id: string;
+  image: string;
+  name: string;
+  price: number;
+  store: string;
+  location: string;
+  description: string;
+  category: string;
+};
 
-// Products data with k/m prices
-const products = [
+type ApiProduct = {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  price_cents: number;
+  images: string[];
+  store_name?: string;
+  store_location?: string;
+};
+
+const fallbackProducts: UiProduct[] = [
   {
-    id: "1",
-    image: "/product_images/shoes/nike-airmax-90.webp",
-    name: "Luna Steel Watch",
-    price: 285000,
-    store: "Watch Hub",
-    location: "Dar es Salaam",
-    description: "Highly durable, classic aesthetic",
-  },
-  {
-    id: "2",
-    image: "/product_images/shoes/puma-sport.jpg",
-    name: "Aero Sprint V2",
-    price: 145000,
-    store: "Sport World",
-    location: "Arusha",
-    description: "Lightweight, breathable mesh",
-  },
-  {
-    id: "3",
-    image: "/product_images/shoes/new-balance-wake-up.webp",
-    name: "Studio Pro Wireless",
-    price: 420000,
-    store: "Audio Center",
-    location: "Mwanza",
-    description: "Superior noise cancellation",
-  },
-  {
-    id: "4",
-    image: "/product_images/shoes/galaxy-5-trainers-with-laces.jpg",
-    name: "Urban Canvas Highs",
-    price: 95000,
-    store: "Street Style",
+    id: "f1",
+    image: "/product_images/laptops/macbook-pro-16.jpg",
+    name: "MacBook Pro 16-inch",
+    price: 219900,
+    store: "Hweibo Store",
     location: "Dodoma",
-    description: "Best-selling everyday essential",
+    description: "Powerful laptop for creative and engineering workloads.",
+    category: "Laptops",
   },
   {
-    id: "5",
-    image: "/product_images/shoes/nike-airmax-90.webp",
-    name: "iPhone 13 Pro",
-    price: 2500000,
-    store: "Tech Hub",
+    id: "f2",
+    image: "/product_images/laptops/lenovo-idea-pad.avif",
+    name: "Lenovo IdeaPad",
+    price: 74900,
+    store: "Hweibo Store",
     location: "Dar es Salaam",
-    description: "Pro camera system, A15 Bionic chip",
+    description: "A clean daily-driver laptop with stable performance.",
+    category: "Laptops",
   },
   {
-    id: "6",
+    id: "f3",
     image: "/product_images/shoes/puma-sport.jpg",
-    name: "Logitech MX Ergonomic Mouse",
-    price: 100000,
-    store: "Computer World",
-    location: "Arusha",
-    description: "Precision tracking, ergonomic design",
-  },
-  {
-    id: "7",
-    image: "/product_images/shoes/new-balance-wake-up.webp",
-    name: "Samsung Galaxy Watch 7",
-    price: 120000,
-    store: "Smart Tech",
+    name: "Puma Sport Runner",
+    price: 12900,
+    store: "Sport World",
     location: "Mwanza",
-    description: "Advanced health monitoring",
-  },
-  {
-    id: "8",
-    image: "/product_images/shoes/galaxy-5-trainers-with-laces.jpg",
-    name: "Sony WH-1000XM5",
-    price: 850000,
-    store: "Audio Premium",
-    location: "Dar es Salaam",
-    description: "Industry-leading noise canceling",
+    description: "Supportive running shoe for daily training.",
+    category: "Shoes",
   },
 ];
 
-// Product Card Component
-function ProductCard({
-  product,
-  onSelect,
-}: {
-  product: (typeof products)[0];
-  onSelect: () => void;
-}) {
+function mapApiProduct(product: ApiProduct): UiProduct {
+  return {
+    id: String(product.id),
+    image: (product.images && product.images[0]) || "/product_images/canon_camera.jpg",
+    name: product.title,
+    price: Number(product.price_cents || 0),
+    store: product.store_name || "Hweibo Store",
+    location: product.store_location || "Dodoma",
+    description: product.description || "",
+    category: product.category || "General",
+  };
+}
+
+function ProductCard({ product, onSelect }: { product: UiProduct; onSelect: () => void }) {
   const [isLiked, setIsLiked] = useState(false);
 
   return (
@@ -142,12 +117,59 @@ function ProductCard({
 }
 
 export default function ExplorePage() {
-  const [activeCategory, setActiveCategory] = useState("trending");
   const { addToCart } = useCart();
   const router = useRouter();
-  const [selectedProduct, setSelectedProduct] = useState<(typeof products)[0] | null>(null);
 
-  const handleAddToCart = (product: (typeof products)[0]) => {
+  const [products, setProducts] = useState<UiProduct[]>(fallbackProducts);
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [selectedProduct, setSelectedProduct] = useState<UiProduct | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [feederLines, setFeederLines] = useState<string[]>([
+    "Starter feed: loading live catalog from backend.",
+  ]);
+
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch("/api/products?limit=60&include_metrics=true", { cache: "no-store" });
+        if (!res.ok) throw new Error(`products_${res.status}`);
+        const data = (await res.json()) as ApiProduct[];
+        if (!mounted) return;
+        if (Array.isArray(data) && data.length > 0) {
+          setProducts(data.map(mapApiProduct));
+          setFeederLines([
+            "Starter feed: live products loaded.",
+            "Starter feed: category filters are generated from backend data.",
+          ]);
+        }
+      } catch {
+        if (!mounted) return;
+        setFeederLines([
+          "Starter feed: backend unavailable, using local fallback catalog.",
+        ]);
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    };
+    void load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const categories = useMemo(() => {
+    const unique = Array.from(new Set(products.map((p) => p.category).filter(Boolean))).sort();
+    return ["All", ...unique];
+  }, [products]);
+
+  const visibleProducts = useMemo(() => {
+    if (activeCategory === "All") return products;
+    return products.filter((p) => p.category === activeCategory);
+  }, [activeCategory, products]);
+
+  const handleAddToCart = (product: UiProduct) => {
     addToCart({
       id: product.id,
       name: product.name,
@@ -163,11 +185,7 @@ export default function ExplorePage() {
     <div className="min-h-screen bg-[#f6f6f8]">
       {selectedProduct ? (
         <>
-          <div
-            className="fixed inset-0 bg-black/30 z-40"
-            onClick={() => setSelectedProduct(null)}
-            aria-hidden="true"
-          />
+          <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setSelectedProduct(null)} aria-hidden="true" />
           <aside className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-[420px] bg-white/85 backdrop-blur-2xl border-l border-zinc-200 shadow-[0_25px_90px_rgba(2,6,23,0.25)] animate-in slide-in-from-right duration-300">
             <div className="h-full flex flex-col">
               <div className="p-5 border-b border-zinc-200 flex items-center justify-between">
@@ -193,11 +211,7 @@ export default function ExplorePage() {
               <div className="p-5 overflow-y-auto flex-1">
                 <div className="rounded-3xl overflow-hidden border border-zinc-200 bg-white shadow-sm">
                   <div className="relative aspect-square bg-zinc-50">
-                    <img
-                      src={selectedProduct.image}
-                      alt={selectedProduct.name}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="p-5">
                     <div className="flex items-start justify-between gap-3">
@@ -247,21 +261,28 @@ export default function ExplorePage() {
         </>
       ) : null}
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-6 rounded-2xl border border-zinc-200 bg-white px-4 py-3">
+          {feederLines.map((line) => (
+            <p key={line} className="text-sm text-zinc-600">
+              {line}
+            </p>
+          ))}
+        </div>
+
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3 overflow-x-auto pb-2">
             {categories.map((cat) => (
               <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
                 className={`px-6 py-3 rounded-full font-semibold text-sm whitespace-nowrap transition-all ${
-                  activeCategory === cat.id
+                  activeCategory === cat
                     ? "bg-black text-white"
                     : "bg-white text-black border border-zinc-200 hover:border-zinc-300"
                 }`}
               >
-                {cat.label}
+                {cat}
               </button>
             ))}
           </div>
@@ -272,11 +293,19 @@ export default function ExplorePage() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} onSelect={() => setSelectedProduct(product)} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <div key={idx} className="h-[340px] rounded-[40px] border-2 border-zinc-200 bg-white animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
+            {visibleProducts.map((product) => (
+              <ProductCard key={product.id} product={product} onSelect={() => setSelectedProduct(product)} />
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );

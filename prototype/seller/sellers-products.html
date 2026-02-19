@@ -71,9 +71,15 @@
       const rows = document.getElementById("productsRows");
       const count = document.getElementById("productCount");
       const empty = document.getElementById("emptyState");
+      if (searchInput.dataset.bound === "1") return;
+      searchInput.dataset.bound = "1";
       const products = window.SellerDemo.readProducts();
+      const managedCategories = window.SellerDemo.readCategories();
 
-      const categories = Array.from(new Set(products.map((product) => product.category))).sort();
+      const categories = Array.from(new Set([
+        ...managedCategories,
+        ...products.map((product) => product.category)
+      ])).sort();
       categories.forEach((category) => {
         const option = document.createElement("option");
         option.value = category;

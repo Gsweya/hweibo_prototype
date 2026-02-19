@@ -153,6 +153,7 @@
                  <p class="text-xs font-bold uppercase tracking-wider text-zinc-500">To</p>
                  <p class="mt-1 font-bold text-zinc-900 truncate">Alexander Hamilton</p>
                  <p class="text-sm text-zinc-500 truncate">Manhattan, New York</p>
+                 <p class="text-xs text-zinc-500 truncate">Product: Luna Steel Watch · Order HW-12345</p>
                </div>
              </div>
            </div>
@@ -168,16 +169,16 @@
              <div class="delivery-map-overlay absolute inset-0">
                <div class="delivery-pin" style="left:18%; top:63%"></div>
                <div class="delivery-map-card" style="left:20%; top:48%">
-                 <p class="meta">Pickup</p>
-                 <p class="title">Watch Hub</p>
-                 <p class="sub">Order HW-12345 · Luna Steel Watch</p>
+                 <p class="meta">Pickup · HW-12345</p>
+                 <p class="title">Luna Steel Watch</p>
+                 <p class="sub">From Watch Hub, Dar es Salaam</p>
                  <span class="delivery-map-status">Packed</span>
                </div>
                <div class="delivery-pin" style="left:79%; top:40%"></div>
                <div class="delivery-map-card" style="right:4%; top:22%">
-                 <p class="meta">Destination</p>
+                 <p class="meta">Destination · HW-12345</p>
                  <p class="title">Alexander Hamilton</p>
-                 <p class="sub">Manhattan delivery point</p>
+                 <p class="sub">Luna Steel Watch · Manhattan delivery point</p>
                  <span class="delivery-map-status">In transit</span>
                </div>
              </div>
@@ -187,23 +188,23 @@
      </div>
 
     <!-- Order Tabs -->
-    <div class="flex gap-4 mb-8 border-b border-zinc-200">
-      <button class="pb-4 text-black font-bold border-b-2 border-black">All Orders</button>
-      <button class="pb-4 text-zinc-500 font-medium hover:text-black">Processing</button>
-      <button class="pb-4 text-zinc-500 font-medium hover:text-black">Delivered</button>
-      <button class="pb-4 text-zinc-500 font-medium hover:text-black">Cancelled</button>
+    <div class="flex gap-4 mb-8 border-b border-zinc-200" id="orderTabs">
+      <button data-order-tab="all" class="pb-4 text-black font-bold border-b-2 border-black">All Orders</button>
+      <button data-order-tab="processing" class="pb-4 text-zinc-500 font-medium hover:text-black">Processing</button>
+      <button data-order-tab="delivered" class="pb-4 text-zinc-500 font-medium hover:text-black">Delivered</button>
+      <button data-order-tab="cancelled" class="pb-4 text-zinc-500 font-medium hover:text-black">Cancelled</button>
     </div>
 
     <!-- Orders List -->
-    <div class="space-y-4">
+    <div id="ordersList" class="space-y-4">
       <!-- Order 1 -->
-      <div class="bg-white rounded-2xl border border-zinc-200 p-6">
+      <div data-order-status="processing" class="bg-white rounded-2xl border border-zinc-200 p-6">
         <div class="flex items-start justify-between mb-4">
           <div>
             <p class="text-sm text-zinc-500">Order #HW-12345</p>
             <p class="text-zinc-400 text-sm">Placed on Jan 15, 2024</p>
           </div>
-          <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-semibold">In Transit</span>
+          <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-semibold">Processing</span>
         </div>
         <div class="flex items-center gap-4 mb-4">
           <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100&h=100&fit=crop" alt="Product" class="w-16 h-16 rounded-lg object-cover">
@@ -223,7 +224,7 @@
       </div>
 
       <!-- Order 2 -->
-      <div class="bg-white rounded-2xl border border-zinc-200 p-6">
+      <div data-order-status="delivered" class="bg-white rounded-2xl border border-zinc-200 p-6">
         <div class="flex items-start justify-between mb-4">
           <div>
             <p class="text-sm text-zinc-500">Order #HW-12344</p>
@@ -249,7 +250,7 @@
       </div>
 
       <!-- Order 3 -->
-      <div class="bg-white rounded-2xl border border-zinc-200 p-6">
+      <div data-order-status="delivered" class="bg-white rounded-2xl border border-zinc-200 p-6">
         <div class="flex items-start justify-between mb-4">
           <div>
             <p class="text-sm text-zinc-500">Order #HW-12340</p>
@@ -274,6 +275,7 @@
         </div>
       </div>
     </div>
+    <p id="ordersEmpty" class="hidden mt-4 text-sm text-zinc-500">No orders found for this tab yet.</p>
   </div>
   <div id="buyerMapModal" class="hidden fixed inset-0 z-[70] bg-black/50 p-4 sm:p-8">
     <div class="bg-white w-full h-full rounded-2xl overflow-hidden border border-zinc-200">
@@ -286,16 +288,16 @@
         <div class="delivery-map-overlay absolute inset-0">
           <div class="delivery-pin" style="left:18%; top:63%"></div>
           <div class="delivery-map-card" style="left:20%; top:48%">
-            <p class="meta">Pickup</p>
-            <p class="title">Watch Hub</p>
-            <p class="sub">Order HW-12345 · Luna Steel Watch</p>
+            <p class="meta">Pickup · HW-12345</p>
+            <p class="title">Luna Steel Watch</p>
+            <p class="sub">From Watch Hub, Dar es Salaam</p>
             <span class="delivery-map-status">Packed</span>
           </div>
           <div class="delivery-pin" style="left:79%; top:40%"></div>
           <div class="delivery-map-card" style="right:4%; top:22%">
-            <p class="meta">Destination</p>
+            <p class="meta">Destination · HW-12345</p>
             <p class="title">Alexander Hamilton</p>
-            <p class="sub">Manhattan delivery point</p>
+            <p class="sub">Luna Steel Watch · Manhattan delivery point</p>
             <span class="delivery-map-status">In transit</span>
           </div>
         </div>
@@ -309,6 +311,42 @@
     document.querySelectorAll(".buyer-track-btn").forEach((btn) => {
       btn.addEventListener("click", () => buyerMapModal.classList.remove("hidden"));
     });
+
+    const tabButtons = Array.from(document.querySelectorAll("[data-order-tab]"));
+    const orderCards = Array.from(document.querySelectorAll("[data-order-status]"));
+    const ordersEmpty = document.getElementById("ordersEmpty");
+
+    function setActiveTab(tab) {
+      tabButtons.forEach((button) => {
+        const isActive = button.getAttribute("data-order-tab") === tab;
+        button.classList.toggle("text-black", isActive);
+        button.classList.toggle("font-bold", isActive);
+        button.classList.toggle("border-b-2", isActive);
+        button.classList.toggle("border-black", isActive);
+        button.classList.toggle("text-zinc-500", !isActive);
+        button.classList.toggle("font-medium", !isActive);
+      });
+    }
+
+    function applyOrderFilter(tab) {
+      let visibleCount = 0;
+      orderCards.forEach((card) => {
+        const status = card.getAttribute("data-order-status");
+        const isVisible = tab === "all" ? true : status === tab;
+        card.classList.toggle("hidden", !isVisible);
+        if (isVisible) visibleCount += 1;
+      });
+      ordersEmpty.classList.toggle("hidden", visibleCount !== 0);
+      setActiveTab(tab);
+    }
+
+    tabButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        applyOrderFilter(button.getAttribute("data-order-tab") || "all");
+      });
+    });
+
+    applyOrderFilter("all");
   </script>
   <script defer src="../proto-nav.js"></script>
 </body>

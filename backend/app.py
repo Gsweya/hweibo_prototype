@@ -18,9 +18,10 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
+from sqlalchemy import or_
 from sqlmodel import Field as SQLField
 from sqlmodel import Relationship, SQLModel, Session, create_engine, select
 
@@ -628,6 +629,249 @@ def _prototype_catalog() -> list[dict]:
     ]
 
 
+_STORE_NAMES = [
+    "Hweibo Store",
+    "Watch Hub",
+    "Sport World",
+    "Audio Center",
+    "Tech Hub",
+    "Urban Market",
+]
+
+_TZ_LOCATIONS = [
+    "Dodoma",
+    "Dar es Salaam",
+    "Arusha",
+    "Mwanza",
+    "Morogoro",
+    "Mbeya",
+]
+
+
+def _normalize_text(value: str) -> str:
+    return value.strip().lower()
+
+
+def _prototype_filter_products(items: list[dict], q: str, category: str) -> list[dict]:
+    normalized_q = _normalize_text(q)
+    normalized_category = _normalize_text(category)
+    out: list[dict] = []
+    for item in items:
+        if normalized_category and _normalize_text(str(item.get("category", ""))) != normalized_category:
+            continue
+        if normalized_q:
+            hay = " ".join(
+                [
+                    str(item.get("title", "")),
+                    str(item.get("description", "")),
+                    str(item.get("category", "")),
+                ]
+            ).lower()
+            if normalized_q not in hay:
+                continue
+        out.append(item)
+    return out
+
+
+def _pseudo_store_for_product(product_id: int, seller_id: int = 0) -> tuple[str, str]:
+    idx = (product_id + seller_id) % len(_STORE_NAMES)
+    loc_idx = (product_id * 3 + seller_id) % len(_TZ_LOCATIONS)
+    return _STORE_NAMES[idx], _TZ_LOCATIONS[loc_idx]
+
+
+def _pseudo_inventory(product_id: int) -> tuple[int, int, str]:
+    stock_units = (product_id * 7) % 35
+    sales_units = 8 + ((product_id * 13) % 120)
+    status = "Out of Stock" if stock_units == 0 else ("Low Stock" if stock_units < 9 else "Active")
+    return stock_units, sales_units, status
+
+
+def _decorate_product(item: dict, seller_name: Optional[str] = None, seller_location: Optional[str] = None) -> dict:
+    pid = int(item.get("id", 0) or 0)
+    sid = int(item.get("seller_id", 0) or 0)
+    default_store, default_location = _pseudo_store_for_product(pid, sid)
+    stock_units, sales_units, status = _pseudo_inventory(pid)
+    return {
+        "id": pid,
+        "title": item.get("title", ""),
+        "description": item.get("description", ""),
+        "category": item.get("category", ""),
+        "price_cents": int(item.get("price_cents", 0) or 0),
+        "currency": item.get("currency", "USD"),
+        "images": list(item.get("images", []) or []),
+        "store_name": seller_name or default_store,
+        "store_location": seller_location or default_location,
+        "stock_units": stock_units,
+        "sales_units": sales_units,
+        "status": status,
+    }
+
+
+def _build_recent_orders(products: list[dict], limit: int = 4) -> list[dict]:
+    customers = [
+        "Asha Mgeni",
+        "John Bwire",
+        "Neema Joseph",
+        "Ibrahim Mussa",
+        "Grace Mtema",
+    ]
+    statuses = ["Completed", "Processing", "Pending", "Completed", "Processing"]
+    out: list[dict] = []
+    for idx, product in enumerate(products[: max(1, limit)]):
+        qty = max(1, min(3, int(product.get("sales_units", 1)) // 20 + 1))
+        amount_cents = int(product.get("price_cents", 0) or 0) * qty
+        out.append(
+            {
+                "id": f"HW-{202600 + idx}",
+                "customer_name": customers[idx % len(customers)],
+                "product_title": product.get("title", ""),
+                "amount_cents": amount_cents,
+                "status": statuses[idx % len(statuses)],
+                "store_name": product.get("store_name", "Hweibo Store"),
+                "store_location": product.get("store_location", "Dodoma"),
+            }
+        )
+    return out
+
+
+def _build_seller_dashboard_payload(products: list[dict]) -> dict:
+    total_products = len(products)
+    total_orders = sum(max(1, int(p.get("sales_units", 0)) // 3) for p in products)
+    total_sales_cents = sum(int(p.get("price_cents", 0)) * int(p.get("sales_units", 0)) for p in products)
+    conversion_rate = round(min(9.9, max(1.8, (total_orders / max(300, total_products * 80)) * 100)), 1)
+
+    top_products = sorted(
+        products,
+        key=lambda p: int(p.get("sales_units", 0)),
+        reverse=True,
+    )[:4]
+
+    return {
+        "stats": {
+            "total_sales_cents": total_sales_cents,
+            "total_orders": total_orders,
+            "total_products": total_products,
+            "conversion_rate": conversion_rate,
+        },
+        "recent_orders": _build_recent_orders(top_products, limit=4),
+        "top_products": [
+            {
+                "id": p.get("id"),
+                "title": p.get("title", ""),
+                "sales_units": int(p.get("sales_units", 0)),
+                "revenue_cents": int(p.get("price_cents", 0)) * int(p.get("sales_units", 0)),
+                "price_cents": int(p.get("price_cents", 0)),
+                "status": p.get("status", "Active"),
+                "stock_units": int(p.get("stock_units", 0)),
+                "image": (p.get("images") or ["/product_images/canon_camera.jpg"])[0],
+            }
+            for p in top_products
+        ],
+        "feeder_lines": [
+            "Starter feed: sync products from catalog to seller dashboard cards.",
+            "Starter feed: track low-stock products before they impact orders.",
+            "Starter feed: keep category naming aligned with admin-managed categories.",
+        ],
+    }
+
+
+def _build_buyer_orders_payload(products: list[dict], limit: int = 8) -> dict:
+    statuses = ["In transit", "Delivered", "Processing", "Delivered", "Cancelled"]
+    to_name = "Alex M."
+    to_location = "Nyerere Square, Dodoma"
+
+    orders = []
+    for idx, product in enumerate(products[: max(1, limit)]):
+        qty = max(1, min(3, int(product.get("sales_units", 0)) // 25 + 1))
+        orders.append(
+            {
+                "id": f"#HW-{12340 + idx}",
+                "date": f"2026-02-{max(1, 18 - idx):02d}",
+                "status": statuses[idx % len(statuses)],
+                "title": product.get("title", ""),
+                "store": f"{product.get('store_name', 'Hweibo Store')} · {product.get('store_location', 'Dodoma')}",
+                "amount_cents": int(product.get("price_cents", 0)) * qty,
+                "from_location": product.get("store_location", "Dodoma"),
+                "to_name": to_name,
+                "to_location": to_location,
+                "product_title": product.get("title", ""),
+            }
+        )
+
+    map_snapshot = {
+        "from_store": orders[0]["store"] if orders else "Hweibo Store · Dodoma",
+        "from_location": orders[0]["from_location"] if orders else "Dodoma",
+        "to_name": to_name,
+        "to_location": to_location,
+        "status": orders[0]["status"] if orders else "In transit",
+        "product_title": orders[0]["product_title"] if orders else "Sample Product",
+    }
+
+    return {
+        "orders": orders,
+        "map_snapshot": map_snapshot,
+        "feeder_lines": [
+            "Starter feed: each order links product, seller location, and delivery status.",
+            "Starter feed: map snapshot is driven by latest active shipment.",
+        ],
+    }
+
+
+def _fetch_products_real(limit: int, q: str, category: str) -> list[dict]:
+    if engine is None:
+        return []
+
+    from sqlalchemy.orm import selectinload
+
+    with Session(engine) as session:
+        stmt = (
+            select(Product)
+            .where(Product.is_active == True)  # noqa: E712
+            .options(selectinload(Product.images))
+            .order_by(Product.created_at.desc())
+            .limit(min(limit, 100))
+        )
+        if q.strip():
+            pattern = f"%{q.strip()}%"
+            stmt = stmt.where(
+                or_(
+                    Product.title.ilike(pattern),
+                    Product.description.ilike(pattern),
+                    Product.category.ilike(pattern),
+                )
+            )
+        if category.strip():
+            stmt = stmt.where(Product.category.ilike(category.strip()))
+
+        products = session.exec(stmt).all()
+
+        seller_profiles = session.exec(select(SellerProfile)).all()
+        seller_map = {p.user_id: p for p in seller_profiles}
+
+        out: list[dict] = []
+        for p in products:
+            seller_profile = seller_map.get(p.seller_id)
+            seller_name = seller_profile.store_name if seller_profile and seller_profile.store_name else None
+            seller_location = seller_profile.store_city if seller_profile and seller_profile.store_city else None
+            out.append(
+                _decorate_product(
+                    {
+                        "id": p.id,
+                        "seller_id": p.seller_id,
+                        "title": p.title,
+                        "description": p.description,
+                        "category": p.category,
+                        "price_cents": p.price_cents,
+                        "currency": p.currency,
+                        "images": [img.url for img in (p.images or [])],
+                    },
+                    seller_name=seller_name,
+                    seller_location=seller_location,
+                )
+            )
+        return out
+
+
 @app.post("/ai/prompts", response_model=PromptResponse)
 def ai_prompt(request: PromptRequest, _: None = Depends(_require_ai_api_key)) -> PromptResponse:
     """
@@ -725,34 +969,62 @@ def ai_prompt(request: PromptRequest, _: None = Depends(_require_ai_api_key)) ->
 
 
 @app.get("/products")
-def list_products(limit: int = 25) -> list[dict]:
-    # Minimal endpoint to support buyer browse/search pages.
+def list_products(
+    limit: int = Query(default=25, ge=1, le=100),
+    q: str = Query(default=""),
+    category: str = Query(default=""),
+    include_metrics: bool = Query(default=True),
+) -> list[dict]:
+    # Main catalog endpoint for buyer browse/search and lightweight seller views.
     if HWEIBO_PROFILE == ProfileMode.prototype or engine is None:
-        return _prototype_catalog()[: max(1, min(limit, 50))]
+        raw = _prototype_filter_products(_prototype_catalog(), q=q, category=category)
+        if include_metrics:
+            return [_decorate_product(item) for item in raw[:limit]]
+        return raw[:limit]
 
-    # Real mode: fetch products + their images.
-    from sqlalchemy.orm import selectinload
+    rows = _fetch_products_real(limit=limit, q=q, category=category)
+    if include_metrics:
+        return rows
+    return [
+        {
+            "id": p["id"],
+            "title": p["title"],
+            "description": p["description"],
+            "category": p["category"],
+            "price_cents": p["price_cents"],
+            "currency": p["currency"],
+            "images": p["images"],
+        }
+        for p in rows
+    ]
 
-    with Session(engine) as session:
-        stmt = (
-            select(Product)
-            .where(Product.is_active == True)  # noqa: E712
-            .options(selectinload(Product.images))
-            .limit(min(limit, 50))
-        )
-        rows = session.exec(stmt).all()
-        return [
-            {
-                "id": p.id,
-                "title": p.title,
-                "description": p.description,
-                "category": p.category,
-                "price_cents": p.price_cents,
-                "currency": p.currency,
-                "images": [img.url for img in (p.images or [])],
-            }
-            for p in rows
-        ]
+
+@app.get("/seller/products")
+def seller_products(
+    limit: int = Query(default=50, ge=1, le=100),
+    q: str = Query(default=""),
+    category: str = Query(default=""),
+) -> dict:
+    products = list_products(limit=limit, q=q, category=category, include_metrics=True)
+    return {
+        "products": products,
+        "feeder_lines": [
+            "Starter feed: search and filter sync with live product catalog.",
+            "Starter feed: product status is derived from stock thresholds.",
+        ],
+    }
+
+
+@app.get("/seller/dashboard")
+def seller_dashboard(limit: int = Query(default=50, ge=1, le=100)) -> dict:
+    products = list_products(limit=limit, q="", category="", include_metrics=True)
+    return _build_seller_dashboard_payload(products)
+
+
+@app.get("/buyer/orders")
+def buyer_orders(limit: int = Query(default=8, ge=1, le=20)) -> dict:
+    products = list_products(limit=max(8, limit), q="", category="", include_metrics=True)
+    return _build_buyer_orders_payload(products, limit=limit)
 
 
 if __name__ == "__main__":
